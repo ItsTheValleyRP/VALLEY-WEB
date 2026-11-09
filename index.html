@@ -195,11 +195,12 @@ body.watermark-fallback:after{content:"THE  VALLEY  ROLEPLAY";display:grid;place
 
 /* Full-screen intro artwork */
 #valley-intro{background:#010713}
-#valley-intro .intro-logo{position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:auto;object-fit:cover;filter:none;z-index:1}
+#valley-intro:before{content:"";position:absolute;inset:-3%;z-index:0;background:url("GIF Valley Way.gif") center/cover no-repeat;filter:blur(28px) brightness(.58);transform:scale(1.06)}
 #valley-intro .intro-halo{z-index:0}
+#valley-intro .intro-logo{position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:auto;object-fit:contain;filter:drop-shadow(0 0 24px #51aaff55);z-index:1}
 #valley-intro .intro-smoke{z-index:2}
 #valley-intro .intro-skip{z-index:4}
-@media(max-width:600px){#valley-intro .intro-logo{width:100%;height:100%;object-fit:cover}}
+@media(max-width:600px){#valley-intro .intro-logo{width:100%;height:100%;object-fit:contain}}
 
 </style>
 </head>
