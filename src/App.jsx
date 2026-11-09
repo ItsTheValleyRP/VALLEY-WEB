@@ -1,0 +1,78 @@
+import React,{useState} from 'react';
+import {ArrowUpRight,Menu,X,ChevronRight,Shield,Users,Radio,MapPin,Search,Car,HeartPulse,Scale} from 'lucide-react';
+
+const INVITE='https://discord.gg/ERkMvmfDm';
+const rules=[
+{title:'Universal Rules',intro:'The standards that keep VALLEY welcoming, fair, and enjoyable. These expectations apply to every member.',items:[
+['18+ Community','VALLEY is an 18+ roleplay community. You must meet the server age requirement to participate.'],
+['Respect','Treat every member with respect. Harassment, discrimination, threats, targeted toxicity, or unnecessary hostility are not acceptable.'],
+['Roleplay First','Stay in character during active roleplay. Keep out-of-character discussions separate from in-character situations.'],
+['Metagaming','Do not use information learned outside the game in character. This includes Discord, streams, messages, or information from other players outside the scene.'],
+['Exploiting','Cheats, scripts, exploits, bug abuse, or third-party tools that provide an unfair advantage are prohibited. Report bugs to staff.'],
+['Impersonation','Do not impersonate staff, emergency services, or another player to mislead or disrupt the community.'],
+['Staff Direction','Follow reasonable staff instructions during active moderation. Use the proper channels to ask questions or appeal a decision.']
+]},
+{title:'Gameplay Rules',intro:'Play fairly and create scenes that give everyone a meaningful opportunity to participate.',items:[
+['RDM — Random Deathmatch','Do not attack or kill another player without valid roleplay initiation and a reasonable in-character reason.'],
+['VDM — Vehicle Deathmatch','Do not use a vehicle as a weapon without valid roleplay grounds. Intentionally running players over to gain an advantage is prohibited.'],
+['Fail Roleplay','Do not perform actions that ignore realistic limitations or prevent others from responding fairly.'],
+['NVL — No Value of Life','Treat your character’s life as valuable. React realistically when facing a serious and immediate threat.'],
+['Powergaming','Do not force outcomes, abuse mechanics, or perform unrealistic actions that deny another player a fair response.'],
+['Combat Logging','Do not leave the server to avoid an active scene, arrest, consequence, or roleplay interaction.'],
+['OOC in Roleplay','Avoid breaking character during active scenes. Use designated out-of-character channels for unrelated discussion.']
+]},
+{title:'New Life Rule',intro:'Keep your character’s memory and return to scenes consistent with the events of the roleplay.',items:[
+['Memory Loss','When the New Life Rule applies, do not use information from the events that led to your character being downed or killed.'],
+['Returning to a Scene','Do not return to an active scene to continue the same conflict or seek retaliation when restricted by the New Life Rule.'],
+['No Revenge Respawns','Do not use a respawn as an opportunity to immediately retaliate against people involved in the previous scene.']
+]},
+{title:'Criminal Rules',intro:'Criminal roleplay should create believable situations and give all participants a fair chance to engage.',items:[
+['Valid Initiation','Give other players a reasonable opportunity to understand and respond to a hostile interaction.'],
+['Hostages','Hostages must be part of a genuine roleplay situation. Do not use accomplices or friends as artificial hostages to manipulate an outcome.'],
+['Robberies','Follow the active robbery requirements, participant limits, and cooldowns established by the server.'],
+['Third-Party Interference','Do not insert yourself into an ongoing criminal scene without valid roleplay grounds.'],
+['Group Responsibility','Groups are responsible for the conduct of their members. Group affiliation does not excuse rule violations.'],
+['Fair Roleplay','Do not treat criminal activity as a competition to win at any cost. Prioritize a fair and engaging scene.']
+]},
+{title:'Heist Rules',intro:'Major criminal scenarios require preparation, communication, and fair participation from everyone involved.',items:[
+['Heist Limits','Respect the participant, vehicle, equipment, and cooldown limits set for each heist.'],
+['No Scene Abuse','Do not start, cancel, or manipulate a heist to avoid consequences or force an unfair advantage.'],
+['Hostage Roleplay','Hostage situations must be believable. Give all participants a reasonable opportunity to negotiate and respond.'],
+['Police Interaction','Allow law enforcement a fair opportunity to respond. Do not exploit map or game mechanics to make a scene unwinnable.'],
+['Scenario Stacking','Do not overlap or stack major criminal scenarios where server rules prohibit it.']
+]},
+{title:'Police Rules',intro:'Law enforcement members are expected to maintain professionalism, consistency, and quality roleplay.',items:[
+['Professional Conduct','Remain respectful and professional while on duty. Do not use department authority for personal disputes.'],
+['Reasonable Escalation','Use appropriate communication and give civilians a reasonable opportunity to comply when circumstances allow.'],
+['Reports and Evidence','Keep reports accurate and provide supporting evidence when required. Never fabricate evidence or incident details.'],
+['Department Equipment','Use department vehicles, tools, and authority only for legitimate duty purposes.'],
+['Fair Treatment','Apply procedures consistently. Do not target someone solely because of their group, reputation, or prior interactions.'],
+['Chain of Command','Follow the department’s established chain of command and operational procedures.']
+]},
+{title:'Ambulance Rules',intro:'Medical roleplay should support the scene and provide a consistent emergency-services experience.',items:[
+['Medical Professionalism','Treat patients respectfully and provide reasonable medical roleplay.'],
+['Scene Safety','Pay attention to active threats and coordinate with responders before entering unsafe scenes.'],
+['No Misuse','Do not use EMS access, equipment, or medical status to gain an unfair advantage.'],
+['Neutrality','Do not take sides in criminal disputes or improperly compromise an active scene.']
+]},
+{title:'Driving & Flying Rules',intro:'Operate vehicles and aircraft in a way that supports believable roleplay and community safety.',items:[
+['Realistic Driving','Drive in a manner appropriate to the vehicle, road, weather, and situation.'],
+['Vehicle Abuse','Do not intentionally use vehicles to ram, launch, or disrupt other players outside valid roleplay.'],
+['Aircraft Safety','Fly responsibly and respect restricted areas, landing locations, and emergency-scene safety.'],
+['Unrealistic Escapes','Do not use impossible jumps, inaccessible locations, or vehicle exploits to escape a scene.']
+]},
+{title:'Staff Rules',intro:'Staff are expected to act fairly, protect player trust, and use their permissions responsibly.',items:[
+['Impartiality','Staff decisions must be based on evidence and server policy, not personal relationships or disagreements.'],
+['Permission Use','Never use staff permissions for personal gain, retaliation, or to influence an in-character situation.'],
+['Confidentiality','Keep private staff discussions, reports, and player information within the appropriate channels.'],
+['Professional Communication','Explain decisions clearly and remain respectful when handling questions or reports.'],
+['Accountability','Staff members are subject to community standards and should report potential conflicts of interest.']
+]}
+];
+
+function Header({page,go}){const[open,setOpen]=useState(false);const nav=['Home','Rules','Announcements','About','Links'];return <header className="topbar"><button className="brand" onClick={()=>go('Home')}><span className="brand-mark">V</span><span>VALLEY<small>ROLEPLAY</small></span></button><nav className="desktop-nav">{nav.map(n=><button key={n} className={page===n?'active':''} onClick={()=>go(n)}>{n}</button>)}</nav><a className="nav-join" href={INVITE} target="_blank" rel="noreferrer">Join Discord <ArrowUpRight size={16}/></a><button className="mobile-toggle" onClick={()=>setOpen(!open)} aria-label="Toggle menu">{open?<X/>:<Menu/>}</button>{open&&<nav className="mobile-nav">{nav.map(n=><button key={n} onClick={()=>{go(n);setOpen(false)}}>{n}</button>)}<a href={INVITE}>Join Discord ↗</a></nav>}</header>}
+function Footer({go}){return <footer className="footer"><div className="footer-top"><button className="brand" onClick={()=>go('Home')}><span className="brand-mark">V</span><span>VALLEY<small>ROLEPLAY</small></span></button><p>YOUR STORY. YOUR CITY. YOUR VALLEY.</p><a href={INVITE} target="_blank" rel="noreferrer">JOIN THE DISCORD ↗</a></div><div className="footer-bottom"><span>© {new Date().getFullYear()} VALLEY ROLEPLAY. ALL RIGHTS RESERVED.</span><span>BUILT FOR THE COMMUNITY.</span></div></footer>}
+function Home({go}){return <><section className="hero"><div className="hero-copy"><div className="eyebrow"><i/> YOUR STORY STARTS HERE</div><h1>MAKE YOUR<br/><em>OWN VALLEY.</em></h1><p>Step into a world built around immersive roleplay, meaningful stories, and a community where every decision can change what happens next.</p><div className="hero-actions"><a className="primary-btn" href={INVITE} target="_blank" rel="noreferrer">Join the community <ArrowUpRight/></a><button className="secondary-btn" onClick={()=>go('Rules')}>Explore the rules <ChevronRight/></button></div><div className="hero-foot"><span><MapPin/> A COMMUNITY-DRIVEN CITY</span><span><Shield/> SERIOUS ROLEPLAY</span></div></div><div className="hero-art"><div className="orbit one"/><div className="orbit two"/><div className="hero-emblem">V</div><div className="art-caption">VALLEY<small>WRITE YOUR NEXT CHAPTER</small></div></div><div className="hero-index">01 <b/> 05</div></section><section className="section-wrap welcome"><div className="section-kicker">01 / THE CITY</div><div className="welcome-grid"><h2>MORE THAN A CITY.<br/><em>A PLACE TO BELONG.</em></h2><div><p className="lead">VALLEY is a roleplay community shaped by the people in it.</p><p>Build a career, start a business, serve the public, or create your own story. Bring your creativity, respect the roleplay, and help make every session memorable.</p><button className="text-link" onClick={()=>go('About')}>Get to know VALLEY ↗</button></div></div></section><section className="feature-band"><div className="section-wrap"><div className="section-kicker">02 / WHAT TO EXPECT</div><div className="feature-grid"><article><Users/><small>01</small><h3>A real community</h3><p>Meet people, build connections, and create stories together.</p></article><article><Radio/><small>02</small><h3>Immersive roleplay</h3><p>Bring your character to life through meaningful interactions.</p></article><article><Shield/><small>03</small><h3>Shared standards</h3><p>Clear expectations help keep the experience fair and enjoyable.</p></article></div></div></section><section className="section-wrap closing-cta"><div><div className="section-kicker">03 / YOUR NEXT CHAPTER</div><h2>READY TO STEP<br/>INTO <em>VALLEY?</em></h2></div><a className="primary-btn" href={INVITE} target="_blank" rel="noreferrer">Join our Discord <ArrowUpRight/></a></section></>}
+function RulesPage(){const[q,setQ]=useState('');const[active,setActive]=useState(0);const filtered=rules.map(r=>({...r,items:r.items.filter(([a,b])=>(a+' '+b).toLowerCase().includes(q.toLowerCase()))}));return <main className="inner-page"><div className="page-heading"><div className="eyebrow">COMMUNITY GUIDELINES / 01</div><h1>THE <em>RULES.</em></h1><p>Take a moment to read through our community standards. These guidelines help keep VALLEY fair, immersive, and enjoyable for everyone.</p></div><div className="rules-layout"><aside className="rules-sidebar"><div className="search-box"><Search/><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search rules..."/></div><div className="sidebar-label">RULE CATEGORIES</div>{rules.map((r,i)=><button key={r.title} className={active===i?'selected':''} onClick={()=>{setActive(i);document.getElementById('rule-'+i)?.scrollIntoView({behavior:'smooth',block:'start'})}}>{String(i+1).padStart(2,'0')} <span>{r.title}</span><ChevronRight/></button>)}</aside><div className="rules-content"><div className="rules-intro"><span className="section-kicker">PLEASE READ BEFORE PLAYING</span><h2>Respect the roleplay.<br/><em>Respect each other.</em></h2><p>These rules apply to all members of the VALLEY community. If you are unsure how a rule applies, ask a member of staff before acting.</p></div>{filtered.map((r,i)=>{if(q&&!r.items.length&&!r.title.toLowerCase().includes(q.toLowerCase()))return null;return <section className="rule-section" id={'rule-'+i} key={r.title}><div className="rule-number">{String(i+1).padStart(2,'0')}</div><div className="rule-body"><h2>{r.title}</h2><p className="rule-intro">{r.intro}</p>{r.items.map(([title,desc],j)=><article className="rule-item" key={title}><h3>{String(j+1).padStart(2,'0')} <span>{title}</span></h3><p>{desc}</p></article>)}</div></section>})}{q&&!filtered.some(r=>r.items.length||r.title.toLowerCase().includes(q.toLowerCase()))&&<p className="no-results">No rules matched your search.</p>}<div className="rules-end"><h3>THANK YOU FOR BEING PART OF VALLEY.</h3><p>By taking part in the community, you agree to follow these standards and help create a positive roleplay environment.</p><a href={INVITE}>Join the community ↗</a></div></div></div></main>}
+function App(){const[page,setPage]=useState('Home');const go=p=>{setPage(p);window.scrollTo({top:0,behavior:'smooth'})};return <div className="site-shell"><Header page={page} go={go}/>{page==='Home'&&<Home go={go}/ >}{page==='Rules'&&<RulesPage/>}{page==='Announcements'&&<main className="inner-page"><div className="page-heading"><div className="eyebrow">WHAT'S HAPPENING / 02</div><h1>THE <em>LATEST.</em></h1><p>Updates and news from the VALLEY community.</p></div><div className="empty-state"><Radio/><h2>STAY IN THE LOOP.</h2><p>Community announcements will appear here. Join our Discord for the latest updates and important news.</p><a className="primary-btn" href={INVITE}>View Discord announcements ↗</a></div></main>}{page==='About'&&<main className="inner-page"><div className="page-heading"><div className="eyebrow">GET TO KNOW US / 03</div><h1>THIS IS <em>VALLEY.</em></h1><p>A community built around creativity, connection, and immersive roleplay.</p></div><div className="about-panel"><div className="about-symbol">V</div><div><span className="section-kicker">OUR COMMUNITY</span><h2>EVERY PLAYER<br/>HAS A STORY.</h2><p>VALLEY is a place to create a character, find your people, and take part in a living roleplay world. We believe the best experiences come from collaboration, fair play, and respect for the stories everyone brings to the city.</p><p>Our goal is to build an environment where new and experienced roleplayers can enjoy memorable scenes and make lasting connections.</p><a className="text-link" href={INVITE}>Become part of it ↗</a></div></div></main>}{page==='Links'&&<main className="inner-page"><div className="page-heading"><div className="eyebrow">FIND YOUR WAY / 04</div><h1>THE <em>CONNECT.</em></h1><p>Everything you need to find and follow the VALLEY community.</p></div><a className="link-card" href={INVITE} target="_blank" rel="noreferrer"><div className="link-icon"><Users/></div><div><span>COMMUNITY</span><h2>VALLEY Discord</h2><p>Join the community, connect with players, and get the latest updates.</p></div><ArrowUpRight/></a></main>}<Footer go={go}/></div>}
+export default App;
