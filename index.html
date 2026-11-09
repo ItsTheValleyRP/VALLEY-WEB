@@ -11,42 +11,44 @@
 @media(max-width:800px){.nav,.join{display:none}.menu{display:block}.mobile-links.open{display:flex;position:absolute;top:81px;left:0;right:0;flex-direction:column;background:#100d18;padding:15px 7%;border-bottom:1px solid var(--line)}.mobile-links button,.mobile-links a{padding:14px 0;text-align:left;border-bottom:1px solid var(--line);text-decoration:none;color:#ddd5e9;background:none}.hero{display:block;padding-top:70px}.hero h1{font-size:clamp(55px,13vw,78px)}.emblem-area{height:300px;margin-top:35px}.emblem{height:170px;width:170px;font-size:125px}.orbit{width:290px;height:210px}.orbit.b{height:300px;width:220px}.two-col,.about-card{grid-template-columns:1fr;gap:20px}.feature-grid{grid-template-columns:1fr}.closing{align-items:flex-start;flex-direction:column}.rules-layout{grid-template-columns:1fr}.sidebar{position:static}.rule{grid-template-columns:35px 1fr;gap:10px}.rule h2{font-size:24px}.about-card{padding:25px}.about-v{height:190px;font-size:155px}.footer-top,.footer-bottom{align-items:flex-start;flex-direction:column}.page{padding:60px 6% 85px}.heading h1{font-size:58px}}
 
 
-/* VALLEY — dark grid / purple community portal */
-:root{color-scheme:dark;--bg:#101014;--panel:#17171e;--panel2:#20202a;--purple:#9b65e8;--text:#f4f1f8;--muted:#aaa4b5;--line:#ffffff18}
-body{background-color:#101014;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px),radial-gradient(ellipse at 50% -15%,#492b6a55,transparent 55%);background-size:36px 36px,36px 36px,auto;background-attachment:fixed}
-.top{height:68px;padding:0 max(5%,calc((100% - 1320px)/2));background:#17131f;border-bottom:3px solid #8e55d2;box-shadow:0 5px 24px #0008}
-.brand{gap:9px;font-size:15px;letter-spacing:2.5px}.mark{width:25px;height:25px;border:0;background:#8e55d2;color:#fff;font-size:15px;transform:none;box-shadow:none}.brand small{font-size:7px;letter-spacing:3px;color:#aaa0b7}
-.nav{gap:5px;height:100%}.nav button{height:100%;padding:0 17px;color:#c7bdcf;font-size:12px;font-weight:700;letter-spacing:.7px;border-bottom:3px solid transparent;margin-bottom:-3px}.nav button.active,.nav button:hover{color:#fff;background:#ffffff0b;border-bottom-color:#c49aff}
-.join,.primary{background:#8e55d2;color:#fff;border:1px solid #a975e9;box-shadow:0 4px 16px #8e55d233}.join:hover,.primary:hover{background:#a36ce2}
+/* VALLEY — animated navy starfield */
+:root{color-scheme:dark;--bg:#041329;--panel:#0a1d38;--panel2:#10294a;--purple:#75caff;--text:#eff8ff;--muted:#a8bfd8;--line:#8dcfff24}
+html{background:#031024}
+body{background-color:#031024;background-image:radial-gradient(ellipse at 50% -12%,#124b8055,transparent 55%),linear-gradient(180deg,#061a36 0%,#041329 55%,#020b1b 100%);background-attachment:fixed;isolation:isolate}
+.starfield{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.starfield i{position:absolute;left:var(--x);top:var(--y);width:var(--size);height:var(--size);border-radius:50%;background:#d9f3ff;box-shadow:0 0 5px 1px #8ed6ff88;opacity:.12;animation:star-twinkle var(--duration) ease-in-out var(--delay) infinite alternate}
+.starfield i:nth-child(3n){background:#8acfff;box-shadow:0 0 8px 2px #5ebaff99}
+.starfield i:nth-child(5n){background:#fff;box-shadow:0 0 11px 2px #d9f3ff99}
+@keyframes star-twinkle{0%{opacity:.06;transform:scale(.6)}45%{opacity:.9;transform:scale(1.35)}100%{opacity:.12;transform:scale(.7)}}
+body>header,body>main,body>section,body>footer{position:relative;z-index:1}
+.top{height:68px;padding:0 max(5%,calc((100% - 1320px)/2));background:#04152cf2;border-bottom:1px solid #4ca9e877;box-shadow:0 5px 24px #0006}
+.brand{gap:9px;font-size:15px;letter-spacing:2.5px}.mark{width:27px;height:27px;border:1px solid #79caff;background:#0d3155;color:#d9f3ff;font-size:16px;transform:none;box-shadow:0 0 15px #4daeff44}.brand small{font-size:7px;letter-spacing:3px;color:#9dbbd8}
+.nav{gap:5px;height:100%}.nav button{height:100%;padding:0 17px;color:#b6cbe0;font-size:12px;font-weight:700;letter-spacing:.7px;border-bottom:3px solid transparent;margin-bottom:-3px}.nav button.active,.nav button:hover{color:#fff;background:#ffffff0b;border-bottom-color:#75caff}
+.join,.primary{background:linear-gradient(110deg,#145da8,#269bd7);color:#fff;border:1px solid #65c3f4;box-shadow:0 4px 18px #1679bd33}.join:hover,.primary:hover{background:linear-gradient(110deg,#237bc7,#65caff)}
 .hero{min-height:480px;padding-top:65px;padding-bottom:55px;grid-template-columns:1.15fr .85fr}
-.hero:before{display:none}.eyebrow,.kicker{color:#b98aef}.eyebrow:before{background:#b98aef}
-.hero h1{font-size:clamp(48px,6vw,76px);letter-spacing:-3px}.hero h1 em,.heading h1 em,.section-title em{color:#b98aef}
-.hero p,.heading p{font-size:15px;line-height:1.75}.emblem-area{height:320px}.orbit{width:270px;height:200px;border-color:#a66be944}.orbit.b{width:210px;height:300px}.emblem{height:155px;width:155px;font-size:112px;color:#d8b9ff;border-color:#a66be988;background:#9b65e81a;box-shadow:0 0 70px #8e55d233}.emblem-label{font-size:10px;letter-spacing:3px}.hero-meta{font-size:9px;color:#8c8494}
-.wrap{padding-top:65px;padding-bottom:65px}.features{background:#15141b;border-color:#ffffff18}.feature{background:#1a1922;border-color:#ffffff1c}.feature .symbol,.feature .num{color:#b98aef}
+.hero:before{display:none}.eyebrow,.kicker{color:#80ceff}.eyebrow:before{background:#80ceff}
+.hero h1{font-size:clamp(48px,6vw,76px);letter-spacing:-3px}.hero h1 em,.heading h1 em,.section-title em{color:#80ceff}
+.hero p,.heading p{font-size:15px;line-height:1.75}.emblem-area{height:320px}.orbit{width:270px;height:200px;border-color:#65c3f455}.orbit.b{width:210px;height:300px}.emblem{height:155px;width:155px;font-size:112px;color:#d4efff;border-color:#69c6ff99;background:#1a72ad24;box-shadow:0 0 70px #1684ca44}.emblem-label{font-size:10px;letter-spacing:3px}.hero-meta{font-size:9px;color:#91a9c2}
+.wrap{padding-top:65px;padding-bottom:65px}.features{background:#061831ef;border-color:#5aa9df33}.feature{background:linear-gradient(140deg,#102b4b,#081a32);border-color:#4d9dd044}.feature .symbol,.feature .num{color:#80ceff}
 .section-title{font-size:clamp(32px,4vw,48px)}
 .page{padding-top:62px}.heading{margin-bottom:40px}.heading h1{font-size:clamp(48px,6vw,74px);letter-spacing:-3px}
-.sidebar{background:#191820;border-color:#ffffff20}.search{background:#101016;border-color:#ffffff22}.side-label{color:#b98aef}.side-btn{color:#c5bdce;border-color:#ffffff15}.side-btn.active,.side-btn:hover{color:#fff;background:#8e55d222}.rule-subnav .side-btn{color:#aaa4b5}.rule-subnav .side-btn:hover{color:#d6b7ff;background:transparent}.side-btn b{color:#b98aef}
-.rules-intro{background:#211a2b;border-color:#9b65e855}.rules-intro h2 em{color:#b98aef}.rule{border-color:#ffffff1c}.rule-no,.rule-item h3 span{color:#b98aef}.rule-item{border-color:#ffffff18}.rule-intro,.rule-item p{color:#b9b2c2}
-.end-note,.empty,.about-card,.link-card{background:#191820;border-color:#ffffff1c}.empty .symbol,.link-card small{color:#b98aef}.link-icon{background:#2c2039;color:#c9a4f4}
-.footer{background:#0b0b0f;border-color:#ffffff1b}.footer-top a{color:#b98aef}.footer-top p,.footer-bottom{color:#8d8795}
-.about-v{border-color:#9b65e855;color:#c8a3f3;background:radial-gradient(circle,#8e55d233,transparent 70%)}
-.text-link,.secondary{color:#e7d9f6}.text-link:hover,.secondary:hover{color:#c49aff}
-@media(max-width:800px){.top{height:64px}.mobile-links.open{top:63px;background:#17131f;border-color:#8e55d2}.mobile-links button,.mobile-links a{color:#eee;border-color:#ffffff18}.hero{padding-top:55px}.emblem-area{height:260px}.emblem{height:135px;width:135px;font-size:98px}.orbit{width:230px;height:170px}.orbit.b{height:250px;width:185px}}
-/* Home dashboard panels */
+.sidebar{background:#081b34;border-color:#5aa9df44}.search{background:#06152b;border-color:#4b91c344}.side-label{color:#80ceff}.side-btn{color:#c1d3e5;border-color:#ffffff18}.side-btn.active,.side-btn:hover{color:#fff;background:#2085c522}.side-btn b{color:#80ceff}
+.rules-intro{background:linear-gradient(130deg,#10345a,#091b34);border-color:#4da9e866}.rules-intro h2 em{color:#80ceff}.rule{border-color:#ffffff1c}.rule-no,.rule-item h3 span{color:#80ceff}.rule-item{border-color:#ffffff18}.rule-intro,.rule-item p{color:#b7c9dc}
+.end-note,.empty,.about-card,.link-card{background:#091b34;border-color:#4d9dd044}.empty .symbol,.link-card small{color:#80ceff}.link-icon{background:#10345a;color:#9bdcff}
+.footer{background:#020c1c;border-color:#4d9dd044}.footer-top a{color:#80ceff}.footer-top p,.footer-bottom{color:#91a9c2}
+.about-v{border-color:#4da9e866;color:#a6dcff;background:radial-gradient(circle,#1679bd44,transparent 70%)}
+.text-link,.secondary{color:#e0f2ff}.text-link:hover,.secondary:hover{color:#80ceff}
 .home-dashboard{display:grid;grid-template-columns:1.2fr .8fr;gap:18px;margin-top:25px}
-.dash-panel{background:#191820;border:1px solid #ffffff1b;padding:24px}
-.dash-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
-.dash-head h3{font:700 17px 'Space Grotesk';margin:0}
-.dash-head span{font-size:9px;letter-spacing:1.6px;color:#b98aef}
-.announcement-row{padding:15px 0;border-top:1px solid #ffffff18}
-.announcement-row strong{display:block;font:600 14px 'Space Grotesk';margin-bottom:6px}
-.announcement-row p{margin:0;color:#aaa4b5;font-size:12px;line-height:1.7}
-.quick-link{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid #ffffff18;color:#e8e0ef;text-decoration:none;font-size:13px}
-.quick-link:hover{color:#c49aff}
-@media(max-width:800px){.home-dashboard{grid-template-columns:1fr}}
+.dash-panel{background:#091b34;border:1px solid #4d9dd044;padding:24px}
+.dash-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}.dash-head h3{font:700 17px 'Space Grotesk';margin:0}.dash-head span{font-size:9px;letter-spacing:1.6px;color:#80ceff}
+.announcement-row{padding:15px 0;border-top:1px solid #ffffff18}.announcement-row strong{display:block;font:600 14px 'Space Grotesk';margin-bottom:6px}.announcement-row p{margin:0;color:#a8bfd8;font-size:12px;line-height:1.7}
+.quick-link{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid #ffffff18;color:#e2f1ff;text-decoration:none;font-size:13px}.quick-link:hover{color:#80ceff}
+@media(max-width:800px){.top{height:64px}.mobile-links.open{top:63px;background:#04152c;border-color:#4ca9e8}.mobile-links button,.mobile-links a{color:#eef8ff;border-color:#ffffff18}.hero{padding-top:55px}.emblem-area{height:260px}.emblem{height:135px;width:135px;font-size:98px}.orbit{width:230px;height:170px}.orbit.b{height:250px;width:185px}.home-dashboard{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.starfield i{animation:none;opacity:.45}}
 </style>
 </head>
 <body>
+<div class="starfield" id="starfield" aria-hidden="true"></div>
 <header class="top"><div class="brand"><span class="mark">V</span><span>VALLEY<small>ROLEPLAY</small></span></div><nav class="nav" id="nav"><button data-page="home" class="active">Home</button><button data-page="rules">Rules</button><button data-page="announcements">Announcements</button><button data-page="about">About</button><button data-page="links">Links</button></nav><a class="join" href="https://discord.gg/ERkMvmfDm" target="_blank" rel="noopener">Join Discord ↗</a><button class="menu" id="menu" aria-label="Open navigation">☰</button><nav class="mobile-links" id="mobile"></nav></header>
 <main id="home" class="page visible" style="padding:0;max-width:none">
 <section class="hero"><div><div class="eyebrow">YOUR STORY STARTS HERE</div><h1>MAKE YOUR<br><em>OWN VALLEY.</em></h1><p>Step into a world built around immersive roleplay, meaningful stories, and a community where every decision can change what happens next.</p><div class="actions"><a class="primary" href="https://discord.gg/ERkMvmfDm" target="_blank" rel="noopener">Join the community ↗</a><button class="secondary" data-go="rules">Explore the rules →</button></div><div class="hero-meta">◈ COMMUNITY-DRIVEN CITY　　◈ SERIOUS ROLEPLAY</div></div><div class="emblem-area"><div class="orbit"></div><div class="orbit b"></div><div class="emblem">V</div><div class="emblem-label">VALLEY<small>WRITE YOUR NEXT CHAPTER</small></div></div></section>
@@ -60,6 +62,7 @@ body{background-color:#101014;background-image:linear-gradient(#ffffff08 1px,tra
 <section id="links" class="page"><div class="heading"><div class="kicker">FIND YOUR WAY / 04</div><h1>THE <em>CONNECT.</em></h1><p>Everything you need to find and follow the VALLEY community.</p></div><a class="link-card" href="https://discord.gg/ERkMvmfDm" target="_blank" rel="noopener"><div class="link-icon">♧</div><div><small>COMMUNITY</small><h2>VALLEY Discord</h2><p>Join the community, connect with players, and get the latest updates.</p></div><b>↗</b></a></section>
 <footer class="footer"><div class="footer-top"><div class="brand"><span class="mark">V</span><span>VALLEY<small>ROLEPLAY</small></span></div><p>YOUR STORY. YOUR CITY. YOUR VALLEY.</p><a href="https://discord.gg/ERkMvmfDm" target="_blank" rel="noopener">JOIN THE DISCORD ↗</a></div><div class="footer-bottom"><span>© <span id="year"></span> VALLEY ROLEPLAY. ALL RIGHTS RESERVED.</span><span>BUILT FOR THE COMMUNITY.</span></div></footer>
 <script>
+const starfield=document.getElementById('starfield');for(let i=0;i<58;i++){const star=document.createElement('i');const x=(i*37.7+11)%100;const y=(i*61.3+7)%100;star.style.setProperty('--x',x+'%');star.style.setProperty('--y',y+'%');star.style.setProperty('--size',(i%7===0?3:1+(i%3))+'px');star.style.setProperty('--duration',(2.1+(i%9)*.63)+'s');star.style.setProperty('--delay',(-((i*1.37)%8))+'s');starfield.appendChild(star);}
 const invite='https://discord.gg/ERkMvmfDm';
 const data=[
 ['Universal Rules','The standards that keep VALLEY welcoming, fair, and enjoyable. These expectations apply to every member.',[['18+ Community','VALLEY is an 18+ roleplay community. You must meet the server age requirement to participate.'],['Respect','Treat every member with respect. Harassment, discrimination, threats, targeted toxicity, or unnecessary hostility are not acceptable.'],['Roleplay First','Stay in character during active roleplay. Keep out-of-character discussions separate from in-character situations.'],['Metagaming','Do not use information learned outside the game in character. This includes Discord, streams, messages, or information from other players outside the scene.'],['Exploiting','Cheats, scripts, exploits, bug abuse, or third-party tools that provide an unfair advantage are prohibited. Report bugs to staff.'],['Impersonation','Do not impersonate staff, emergency services, or another player to mislead or disrupt the community.'],['Staff Direction','Follow reasonable staff instructions during active moderation. Use the proper channels to ask questions or appeal a decision.']]],
