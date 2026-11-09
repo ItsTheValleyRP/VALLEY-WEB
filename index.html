@@ -83,6 +83,23 @@ body{background-image:radial-gradient(ellipse at 18% 22%,#0c4b7b2a,transparent 3
  .announcement-row{padding:15px 0}
 }
 
+
+/* Hero CTA and metadata centering fix */
+.hero>div:first-child{text-align:center;margin-inline:auto;width:100%}
+.hero .eyebrow{display:block}
+.hero .hero p{margin-inline:auto}
+.hero .actions{justify-content:center;gap:16px;margin-top:30px}
+.hero .actions .primary,.hero .actions .secondary{min-height:48px;padding:14px 20px;display:inline-flex;align-items:center;justify-content:center;line-height:1.2}
+.hero .actions .secondary{border:1px solid #78c9ff55;background:#78c9ff12;color:#dff3ff}
+.hero .actions .secondary:hover{background:#78c9ff25;border-color:#78c9ff}
+.hero-meta{position:static;left:auto;bottom:auto;width:100%;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px 22px;margin-top:28px;text-align:center;line-height:1.7}
+@media(max-width:800px){
+ .hero>div:first-child{max-width:100%;text-align:center}
+ .hero .hero p{margin-inline:auto}
+ .hero .actions{justify-content:center}
+ .hero-meta{justify-content:center;margin-top:24px}
+}
+
 </style>
 </head>
 <body>
