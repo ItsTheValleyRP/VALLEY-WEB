@@ -25,6 +25,27 @@
 body{background-image:radial-gradient(ellipse at 18% 22%,#0c4b7b2a,transparent 38%),radial-gradient(ellipse at 82% 68%,#14558a22,transparent 42%),radial-gradient(ellipse at 50% -12%,#124b8055,transparent 55%),linear-gradient(180deg,#061a36 0%,#041329 55%,#020b1b 100%)}
 @media(prefers-reduced-motion:reduce){.starfield i,.starfield:before,.starfield:after{animation:none!important}.starfield i{opacity:.45}.starfield:before,.starfield:after{display:none}}
 
+
+/* Refined hero alignment and independent star flashes */
+.hero{grid-template-columns:minmax(0,1.08fr) minmax(300px,.92fr);column-gap:38px}
+.hero>div:first-child{max-width:610px;min-width:0}
+.hero .actions{gap:28px;flex-wrap:wrap}
+.hero .primary,.hero .secondary{white-space:nowrap}
+@keyframes star-flash{
+  0%,62%,100%{opacity:.08;transform:translate3d(0,0,0) scale(.65);filter:brightness(.8)}
+  70%{opacity:.3;transform:translate3d(2px,-5px,0) scale(.85);filter:brightness(1.2)}
+  76%{opacity:1;transform:translate3d(-2px,-10px,0) scale(2.1);filter:brightness(2.8)}
+  81%{opacity:.95;transform:translate3d(1px,-7px,0) scale(1.5);filter:brightness(2.2)}
+  90%{opacity:.2;transform:translate3d(-1px,-3px,0) scale(.8);filter:brightness(1)}
+}
+.starfield i{animation-name:star-flash;animation-duration:var(--duration);animation-delay:var(--delay);animation-timing-function:ease-in-out;animation-iteration-count:infinite}
+.starfield i:nth-child(4n){animation-name:star-float}
+.starfield i:nth-child(9n){animation-name:star-flash;animation-duration:calc(var(--duration) * 1.35)}
+@media(max-width:800px){
+ .hero{grid-template-columns:1fr;column-gap:0}
+ .hero>div:first-child{max-width:100%}
+ .hero .actions{gap:16px}
+}
 </style>
 </head>
 <body>
@@ -42,7 +63,7 @@ body{background-image:radial-gradient(ellipse at 18% 22%,#0c4b7b2a,transparent 3
 <section id="links" class="page"><div class="heading"><div class="kicker">FIND YOUR WAY / 04</div><h1>THE <em>CONNECT.</em></h1><p>Everything you need to find and follow the VALLEY community.</p></div><a class="link-card" href="https://discord.gg/ERkMvmfDm" target="_blank" rel="noopener"><div class="link-icon">♧</div><div><small>COMMUNITY</small><h2>VALLEY Discord</h2><p>Join the community, connect with players, and get the latest updates.</p></div><b>↗</b></a></section>
 <footer class="footer"><div class="footer-top"><div class="brand"><span class="mark">V</span><span>VALLEY<small>ROLEPLAY</small></span></div><p>YOUR STORY. YOUR CITY. YOUR VALLEY.</p><a href="https://discord.gg/ERkMvmfDm" target="_blank" rel="noopener">JOIN THE DISCORD ↗</a></div><div class="footer-bottom"><span>© <span id="year"></span> VALLEY ROLEPLAY. ALL RIGHTS RESERVED.</span><span>BUILT FOR THE COMMUNITY.</span></div></footer>
 <script>
-const starfield=document.getElementById('starfield');for(let i=0;i<105;i++){const star=document.createElement('i');const x=(i*37.719+11.3)%100;const y=(i*61.337+7.9)%100;star.style.setProperty('--x',x+'%');star.style.setProperty('--y',y+'%');star.style.setProperty('--size',(i%13===0?3:1+(i%3)*.55)+'px');star.style.setProperty('--duration',(5.5+(i%13)*1.15)+'s');star.style.setProperty('--delay',(-((i*1.73)%18))+'s');starfield.appendChild(star);}
+const starfield=document.getElementById('starfield');for(let i=0;i<105;i++){const star=document.createElement('i');const x=(i*37.719+11.3)%100;const y=(i*61.337+7.9)%100;star.style.setProperty('--x',x+'%');star.style.setProperty('--y',y+'%');star.style.setProperty('--size',(i%13===0?3:1+(i%3)*.55)+'px');star.style.setProperty('--duration',(5.5+(i%13)*1.15)+'s');star.style.setProperty('--delay',(-((i*2.37)%24))+'s');starfield.appendChild(star);}
 const invite='https://discord.gg/ERkMvmfDm';
 const data=[
 ['Universal Rules','The standards that keep VALLEY welcoming, fair, and enjoyable. These expectations apply to every member.',[['18+ Community','VALLEY is an 18+ roleplay community. You must meet the server age requirement to participate.'],['Respect','Treat every member with respect. Harassment, discrimination, threats, targeted toxicity, or unnecessary hostility are not acceptable.'],['Roleplay First','Stay in character during active roleplay. Keep out-of-character discussions separate from in-character situations.'],['Metagaming','Do not use information learned outside the game in character. This includes Discord, streams, messages, or information from other players outside the scene.'],['Exploiting','Cheats, scripts, exploits, bug abuse, or third-party tools that provide an unfair advantage are prohibited. Report bugs to staff.'],['Impersonation','Do not impersonate staff, emergency services, or another player to mislead or disrupt the community.'],['Staff Direction','Follow reasonable staff instructions during active moderation. Use the proper channels to ask questions or appeal a decision.']]],
