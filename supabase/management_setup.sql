@@ -274,7 +274,7 @@ returns table (
 language plpgsql
 security definer
 set search_path = public, pg_temp
-as $
+as $search_fn$
 declare
   v_uid uuid := auth.uid();
   v_rank text;
@@ -300,7 +300,7 @@ begin
   order by coalesce(r.rank,'') desc, p.display_name
   limit 50;
 end;
-$;
+$search_fn$;
 
 create or replace function public.valley_management_create_announcement(
   p_title text,
