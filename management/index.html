@@ -50,6 +50,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 <button class="tab" data-tab="search">Find Members</button>
 <button class="tab" data-tab="audit">Audit Logs</button>
 <button class="tab" data-tab="announcements">Announcements</button>
+<button class="tab hidden" data-tab="designer">Website Designer</button>
 </nav>
 <section class="section active" id="section-staff">
 <div class="panel"><div class="sectionhead"><h2>Current staff team</h2><span class="muted" id="staff-count"></span></div>
@@ -77,6 +78,40 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 <div class="panel"><div class="sectionhead"><h2>Recent announcements</h2></div><div id="announcement-list"></div></div>
 </div>
 </section>
+<section class="section" id="section-designer">
+<div class="panel">
+<div class="sectionhead"><div><h2>Website Designer</h2><p class="muted">Edit the live homepage content and colours. Changes are saved to the website database, not a draft.</p></div><span class="rankpill">MANAGEMENT+</span></div>
+<div class="notice">When you save, the public website picks up the changes automatically. Visitors already on the page will see them on the next refresh or automatic update.</div>
+<div class="announcegrid">
+<div>
+<h3>Homepage hero</h3>
+<label class="muted" for="web-hero-eyebrow">Small heading</label><input id="web-hero-eyebrow" class="field" maxlength="100" style="margin:6px 0 12px">
+<label class="muted" for="web-title-one">Main heading — first line</label><input id="web-title-one" class="field" maxlength="70" style="margin:6px 0 12px">
+<label class="muted" for="web-title-two">Main heading — highlighted line</label><input id="web-title-two" class="field" maxlength="70" style="margin:6px 0 12px">
+<label class="muted" for="web-description">Description</label><textarea id="web-description" class="field" maxlength="1000" style="margin:6px 0 12px"></textarea>
+</div>
+<div>
+<h3>Buttons and footer</h3>
+<label class="muted" for="web-primary-text">Main button text</label><input id="web-primary-text" class="field" maxlength="60" style="margin:6px 0 12px">
+<label class="muted" for="web-primary-url">Main button link</label><input id="web-primary-url" class="field" maxlength="300" placeholder="https://..." style="margin:6px 0 12px">
+<label class="muted" for="web-secondary-text">Second button text</label><input id="web-secondary-text" class="field" maxlength="60" style="margin:6px 0 12px">
+<label class="muted" for="web-footer">Footer tagline</label><input id="web-footer" class="field" maxlength="120" style="margin:6px 0 12px">
+<label class="muted" for="web-site-title">Browser tab title</label><input id="web-site-title" class="field" maxlength="80" style="margin:6px 0 12px">
+</div>
+</div>
+<h3>Website colours</h3>
+<div class="announcegrid">
+<label class="muted">Accent colour<input id="web-color-primary" class="field" type="color" style="display:block;height:48px;padding:5px;margin-top:6px"></label>
+<label class="muted">Background colour<input id="web-color-background" class="field" type="color" style="display:block;height:48px;padding:5px;margin-top:6px"></label>
+<label class="muted">Main text colour<input id="web-color-text" class="field" type="color" style="display:block;height:48px;padding:5px;margin-top:6px"></label>
+</div>
+<div style="display:flex;gap:10px;align-items:center;margin-top:22px;flex-wrap:wrap">
+<button id="website-save">SAVE WEBSITE CHANGES</button>
+<span id="website-save-status" class="muted"></span>
+</div>
+<div id="website-save-error" class="error" role="alert"></div>
+</div>
+</section>
 </section>
 </main>
 <script>
@@ -86,7 +121,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
  const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
  const $=id=>document.getElementById(id);
  const rankOrder=['Super Owner','Staff Owner','Director','Assistant Director','Management','Senior Admin','Admin'];
- let session=null, overview=null;
+ let session=null, overview=null, siteSettings={};
  const escText=(node,value)=>{node.textContent=value??''};
  const show=(node,on)=>node.classList.toggle('hidden',!on);
  const formatDate=value=>{if(!value)return '—';const d=new Date(value);return Number.isNaN(d.getTime())?'—':d.toLocaleString();};
@@ -154,6 +189,8 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    $('tabs').querySelector('[data-tab="audit"]').classList.toggle('hidden',admin);
    show($('stats'),!admin);
    if(admin)activateTab('announcements');
+   const canDesign=rankOrder.indexOf(rank)<=4;
+   show($('tabs').querySelector('[data-tab="designer"]'),canDesign);
    renderStaff();renderAudit();renderAnnouncements();
    setView('app');
  };
@@ -161,6 +198,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    const {data,error}=await client.rpc('valley_management_overview');
    if(error){$('denied-message').textContent=error.message.includes('management access')?'This Discord account does not have a management role.':'Could not load management permissions: '+error.message;setView('denied');return;}
    overview=data;render();
+   if(rankOrder.indexOf(data.my_rank)<=4) await loadWebsiteSettings();
  };
  const sync=async s=>{
    session=s;
@@ -215,6 +253,45 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
      root.append(row);
    });
  }
+ 
+ async function loadWebsiteSettings(){
+   const {data,error}=await client.rpc('valley_public_website_settings');
+   if(error){$('website-save-error').textContent=error.message;return;}
+   siteSettings=data||{};
+   const fields={
+     'web-hero-eyebrow':'hero_eyebrow','web-title-one':'hero_title_line1',
+     'web-title-two':'hero_title_line2','web-description':'hero_description',
+     'web-primary-text':'hero_primary_text','web-primary-url':'hero_primary_url',
+     'web-secondary-text':'hero_secondary_text','web-footer':'footer_tagline',
+     'web-site-title':'site_title','web-color-primary':'theme_primary',
+     'web-color-background':'theme_background','web-color-text':'theme_text'
+   };
+   Object.entries(fields).forEach(([id,key])=>{if($(id)&&siteSettings[key])$(id).value=siteSettings[key];});
+ }
+ $('website-save').addEventListener('click',async()=>{
+   const button=$('website-save');button.disabled=true;button.textContent='SAVING...';
+   $('website-save-error').textContent='';$('website-save-status').textContent='';
+   const settings={
+     hero_eyebrow:$('web-hero-eyebrow').value.trim(),
+     hero_title_line1:$('web-title-one').value.trim(),
+     hero_title_line2:$('web-title-two').value.trim(),
+     hero_description:$('web-description').value.trim(),
+     hero_primary_text:$('web-primary-text').value.trim(),
+     hero_primary_url:$('web-primary-url').value.trim(),
+     hero_secondary_text:$('web-secondary-text').value.trim(),
+     footer_tagline:$('web-footer').value.trim(),
+     site_title:$('web-site-title').value.trim(),
+     theme_primary:$('web-color-primary').value,
+     theme_background:$('web-color-background').value,
+     theme_text:$('web-color-text').value
+   };
+   const {data,error}=await client.rpc('valley_management_save_website_settings',{p_settings:settings});
+   button.disabled=false;button.textContent='SAVE WEBSITE CHANGES';
+   if(error){$('website-save-error').textContent=error.message;return;}
+   siteSettings=data||settings;
+   $('website-save-status').textContent='Saved successfully. The live website will update automatically.';
+ });
+
  $('announcement-submit').addEventListener('click',async()=>{
    const button=$('announcement-submit');button.disabled=true;button.textContent='POSTING...';
    $('announcement-error').textContent='';show($('announcement-success'),false);
