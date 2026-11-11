@@ -411,6 +411,26 @@ const mobile=document.getElementById('mobile');mobile.innerHTML=['home','guide',
      const em=h.querySelector('em');if(em&&typeof highlight==='string')em.textContent=highlight;
    };
    const safeUrl=value=>typeof value==='string'&&/^https?:\/\//i.test(value)?value:null;
+   const home=pages.home;
+   if(home){
+     const root=document.getElementById('home');
+     set('#home>.wrap:first-of-type>.kicker',home.intro_kicker);
+     const introTitle=root.querySelector('.wrap:first-of-type .section-title');
+     if(introTitle){introTitle.innerHTML=esc(home.intro_title_line1||'WELCOME TO')+' <em>'+esc(home.intro_title_highlight||'VALLEY.')+'</em>';}
+     set('#home>.wrap:first-of-type>.lead',home.intro_description);
+     if(Array.isArray(home.features)){
+       const grid=root.querySelector('.features .feature-grid');
+       grid.innerHTML=home.features.map((feature,i)=>'<article class="feature"><span class="symbol">'+esc(feature.symbol||'✦')+'</span><span class="num">'+String(i+1).padStart(2,'0')+'</span><h3>'+esc(feature.title||'')+'</h3><p>'+esc(feature.description||'')+'</p></article>').join('');
+     }
+     const closing=root.querySelector('.closing');
+     if(closing){
+       set('#home .closing .kicker',home.closing_kicker);
+       const title=closing.querySelector('h2');
+       if(title)title.innerHTML=esc(home.closing_line1||'READY TO STEP')+'<br>'+esc(home.closing_line2||'INTO')+' <em>'+esc(home.closing_highlight||'VALLEY?')+'</em>';
+       const link=closing.querySelector('a'),url=safeUrl(home.closing_url);
+       if(link){if(typeof home.closing_button_text==='string')link.textContent=home.closing_button_text+' ↗';if(url)link.href=url;}
+     }
+   }
    const guide=pages.guide;
    if(guide){
      const root=document.getElementById('guide');
@@ -453,8 +473,15 @@ const mobile=document.getElementById('mobile');mobile.innerHTML=['home','guide',
      set('#about .about .kicker',about.card_kicker);
      const title=root.querySelector('.about h2');
      if(title)title.innerHTML=esc(about.card_title_line1||'EVERY PLAYER')+'<br>'+esc(about.card_title_line2||'HAS A STORY.');
-     const paragraphs=root.querySelectorAll('.about p');
-     if(Array.isArray(about.paragraphs))about.paragraphs.forEach((value,i)=>{if(paragraphs[i])paragraphs[i].textContent=value;});
+     const aboutCopy=root.querySelector('.about'),linkNode=aboutCopy.querySelector('a');
+     if(Array.isArray(about.paragraphs)){
+       aboutCopy.querySelectorAll('p').forEach((p,i)=>{if(i>=about.paragraphs.length)p.remove();});
+       about.paragraphs.forEach((value,i)=>{
+         let paragraph=aboutCopy.querySelectorAll('p')[i];
+         if(!paragraph){paragraph=document.createElement('p');aboutCopy.insertBefore(paragraph,linkNode);}
+         paragraph.textContent=value;
+       });
+     }
      const link=root.querySelector('.about a'),url=safeUrl(about.link_url);
      if(link){if(typeof about.link_text==='string')link.textContent=about.link_text+' ↗';if(url)link.href=url;}
    }
