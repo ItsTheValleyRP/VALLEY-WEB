@@ -34,7 +34,7 @@ begin
       if jsonb_typeof(p_settings->v_key) <> 'object' then raise exception 'Page content must be a JSON object'; end if;
       if octet_length((p_settings->v_key)::text) > 60000 then raise exception 'Page content is too large'; end if;
       if exists (
-        select 1 from jsonb_object_keys(p_settings->v_key) as page_key
+        select 1 from jsonb_object_keys(p_settings->v_key) as page_keys(page_key)
         where page_key not in ('guide','rules','about')
       ) then raise exception 'Unsupported page content section'; end if;
       continue;
@@ -64,7 +64,7 @@ begin
   insert into public.valley_staff_audit(actor_user_id,action,details)
   values(v_uid,'website_settings_updated',jsonb_build_object(
     'fields',case when p_settings ? 'pages'
-      then (select coalesce(jsonb_agg(k),'[]'::jsonb) from jsonb_object_keys(p_settings) k)
+      then (select coalesce(jsonb_agg(key),'[]'::jsonb) from jsonb_object_keys(p_settings) as setting_keys(key))
       else p_settings end
   ));
 
