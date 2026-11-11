@@ -99,6 +99,16 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 <label class="muted" for="web-site-title">Browser tab title</label><input id="web-site-title" class="field" maxlength="80" style="margin:6px 0 12px">
 </div>
 </div>
+<div class="panel" style="margin-top:22px">
+<h3 style="margin-top:0">Page content editor</h3>
+<p class="muted">Edit the Guide, Rules and About content below. These fields use formatted JSON so you can add, remove, or reorder entries and categories. Keep the field names and quote marks in place. The current website content is loaded as your starting point.</p>
+<div style="display:grid;grid-template-columns:1fr;gap:14px">
+<label class="muted" for="web-guide-json">Guide entries and headings<textarea id="web-guide-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:260px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
+<label class="muted" for="web-rules-json">Rules categories and individual rules<textarea id="web-rules-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:360px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
+<label class="muted" for="web-about-json">About page content<textarea id="web-about-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:240px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
+</div>
+<p class="muted" style="font-size:12px">Tip: use a JSON formatter if you want to make large edits easier. Text is displayed as text on the public website; it is not treated as HTML or code.</p>
+</div>
 <h3>Website colours</h3>
 <div class="announcegrid">
 <label class="muted">Accent colour<input id="web-color-primary" class="field" type="color" style="display:block;height:48px;padding:5px;margin-top:6px"></label>
@@ -255,10 +265,41 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    });
  }
  
+ async function loadDefaultPageContent(){
+   const response=await fetch('../index.html',{cache:'no-store'});
+   if(!response.ok)throw new Error('Could not load the current website content.');
+   const doc=new DOMParser().parseFromString(await response.text(),'text/html');
+   const rulesNode=doc.getElementById('valley-default-rules');
+   if(!rulesNode)throw new Error('Could not load the default rules.');
+   const rulesRaw=JSON.parse(rulesNode.textContent);
+   const guideRoot=doc.getElementById('guide');
+   const guideEntries=[...guideRoot.querySelectorAll('.guide-entry')].map((entry,i)=>({
+     icon:entry.querySelector('.guide-entry-icon')?.textContent.trim()||'✦',
+     kicker:entry.querySelector('.guide-entry-heading small')?.textContent.trim()||String(i+1).padStart(2,'0')+' / CITY GUIDE',
+     title:entry.querySelector('.guide-entry-heading strong')?.textContent.trim()||'',
+     subtitle:entry.querySelector('.guide-entry-heading em')?.textContent.trim()||'',
+     body:entry.querySelector('.guide-entry-body p')?.textContent.trim()||''
+   }));
+   const heading=(root)=>({kicker:root.querySelector('.heading .kicker')?.textContent.trim()||'',title_line1:root.querySelector('.heading h1')?.childNodes[0]?.textContent.trim()||'',title_highlight:root.querySelector('.heading h1 em')?.textContent.trim()||'',description:root.querySelector('.heading p')?.textContent.trim()||''});
+   const guide={...heading(guideRoot),entries:guideEntries,signoff_kicker:guideRoot.querySelector('.guide-signoff .kicker')?.textContent.trim()||'',signoff_line1:'A NEW CITY. A NEW BEGINNING.',signoff_highlight:'YOUR STORY.'};
+   const rulesRoot=doc.getElementById('rules');
+   const rules={...heading(rulesRoot),categories:rulesRaw.map(r=>({title:r[0],description:r[1],rules:r[2].map(x=>({title:x[0],description:x[1]}))})),intro_kicker:rulesRoot.querySelector('.rules-intro .kicker')?.textContent.trim()||'',intro_line1:'Respect the roleplay.',intro_highlight:'Respect each other.',intro_description:rulesRoot.querySelector('.rules-intro p')?.textContent.trim()||'',end_title:rulesRoot.querySelector('.end-note h3')?.textContent.trim()||'',end_description:rulesRoot.querySelector('.end-note p')?.textContent.trim()||'',invite_url:rulesRoot.querySelector('.end-note a')?.href||''};
+   const aboutRoot=doc.getElementById('about'),paragraphs=[...aboutRoot.querySelectorAll('.about p')].map(p=>p.textContent.trim());
+   const about={...heading(aboutRoot),card_kicker:aboutRoot.querySelector('.about .kicker')?.textContent.trim()||'',card_title_line1:'EVERY PLAYER',card_title_line2:'HAS A STORY.',paragraphs,link_text:(aboutRoot.querySelector('.about a')?.textContent||'Become part of it').replace(/\s*↗$/,''),link_url:aboutRoot.querySelector('.about a')?.href||''};
+   return {guide,rules,about};
+ }
  async function loadWebsiteSettings(){
    const {data,error}=await client.rpc('valley_public_website_settings');
    if(error){$('website-save-error').textContent=error.message;return;}
    siteSettings=data||{};
+   try{
+     const defaults=await loadDefaultPageContent();
+     const pages=siteSettings.pages||defaults;
+     $('web-guide-json').value=JSON.stringify(pages.guide||defaults.guide,null,2);
+     $('web-rules-json').value=JSON.stringify(pages.rules||defaults.rules,null,2);
+     $('web-about-json').value=JSON.stringify(pages.about||defaults.about,null,2);
+   }catch(e){$('website-save-error').textContent='Page editor could not load current content: '+e.message;}
+
    const fields={
      'web-hero-eyebrow':'hero_eyebrow','web-title-one':'hero_title_line1',
      'web-title-two':'hero_title_line2','web-description':'hero_description',
@@ -284,8 +325,15 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
      site_title:$('web-site-title').value.trim(),
      theme_primary:$('web-color-primary').value,
      theme_background:$('web-color-background').value,
-     theme_text:$('web-color-text').value
+     theme_text:$('web-color-text').value,
+     pages:{
+       guide:JSON.parse($('web-guide-json').value),
+       rules:JSON.parse($('web-rules-json').value),
+       about:JSON.parse($('web-about-json').value)
+     }
    };
+   let parsedSettings;
+   try{parsedSettings=settings;}catch(e){$('website-save-error').textContent='Please correct the page JSON: '+e.message;button.disabled=false;button.textContent='SAVE WEBSITE CHANGES';return;}
    const {data,error}=await client.rpc('valley_management_save_website_settings',{p_settings:settings});
    button.disabled=false;button.textContent='SAVE WEBSITE CHANGES';
    if(error){$('website-save-error').textContent=error.message;return;}
