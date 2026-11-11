@@ -271,7 +271,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    if(!response.ok)throw new Error('Could not load the current website content.');
    const doc=new DOMParser().parseFromString(await response.text(),'text/html');
    const homeRoot=doc.getElementById('home');
-   const homeIntro=homeRoot.querySelector('.wrap:first-of-type');
+   const homeIntro=homeRoot.querySelector('.wrap:not(.closing)');
    const homeTitle=homeIntro.querySelector('.section-title');
    const homeFeatures=[...homeRoot.querySelectorAll('.features .feature')].map(feature=>({
      symbol:feature.querySelector('.symbol')?.textContent.trim()||'✦',
