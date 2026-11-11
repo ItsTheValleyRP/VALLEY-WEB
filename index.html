@@ -369,4 +369,28 @@ const mobile=document.getElementById('mobile');mobile.innerHTML=['home','guide',
  client.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>syncSession(session),0);});
  client.auth.getSession().then(({data,error:sessionError})=>{if(sessionError)showError(error,'Could not restore your session. Please refresh the page.');syncSession(data?.session||null);});
 })();</script>
+
+<script>
+// Load published management announcements into the existing announcements page.
+(()=>{
+ if(!window.supabase)return;
+ const client=window.supabase.createClient('https://bqibeyeltgijvjghtnve.supabase.co','sb_publishable_Pb8W_qAqJPTCKV_cnoqgXg_aP_9fgXt');
+ const grid=document.querySelector('#announcements .announcement-grid');
+ if(!grid)return;
+ client.rpc('valley_public_announcements').then(({data,error})=>{
+   if(error||!Array.isArray(data)||!data.length)return;
+   data.slice().reverse().forEach(item=>{
+     const card=document.createElement('article');
+     card.className='announcement-card';
+     const tag=document.createElement('span');tag.className='announcement-tag';tag.textContent='OFFICIAL UPDATE';
+     const title=document.createElement('h2');title.textContent=item.title;
+     const body=document.createElement('p');body.textContent=item.body;
+     const date=document.createElement('p');date.className='announcement-date';
+     date.textContent=new Date(item.created_at).toLocaleDateString();
+     card.append(tag,title,body,date);
+     grid.insertBefore(card,grid.firstChild);
+   });
+ });
+})();
+</script>
 </body></html>
