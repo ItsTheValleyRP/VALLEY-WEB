@@ -1,4 +1,4 @@
--- Enable the expanded VALLEY page designer (Guide, Rules and About).
+-- Enable the expanded VALLEY page designer (Home, Guide, Rules and About).
 -- Run this file in Supabase SQL Editor after the existing management setup.
 create or replace function public.valley_management_save_website_settings(p_settings jsonb)
 returns jsonb
@@ -35,7 +35,7 @@ begin
       if octet_length((p_settings->v_key)::text) > 60000 then raise exception 'Page content is too large'; end if;
       if exists (
         select 1 from jsonb_object_keys(p_settings->v_key) as page_keys(page_key)
-        where page_key not in ('guide','rules','about')
+        where page_key not in ('home','guide','rules','about')
       ) then raise exception 'Unsupported page content section'; end if;
       continue;
     end if;
