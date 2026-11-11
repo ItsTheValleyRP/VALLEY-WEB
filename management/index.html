@@ -154,7 +154,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
    document.querySelectorAll('.section').forEach(s=>s.classList.toggle('active',s.id==='section-'+name));
  };
- document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab)));
+ document.querySelectorAll('#tabs .tab').forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.tab)));
  const makeCell=(tag,text,className)=>{const el=document.createElement(tag);el.textContent=text??'';if(className)el.className=className;return el;};
  const renderStaff=()=>{
    const body=$('staff-body');body.replaceChildren();
