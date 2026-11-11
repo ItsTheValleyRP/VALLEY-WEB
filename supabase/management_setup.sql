@@ -99,6 +99,7 @@ begin
     raise exception 'You do not have management access';
   end if;
 
+  if v_rank <> 'Admin' then
   select coalesce(jsonb_agg(jsonb_build_object(
     'user_id', r.user_id,
     'rank', r.rank,
@@ -109,7 +110,8 @@ begin
   into v_members
   from public.valley_staff_roles r
   left join public.profiles p on p.id = r.user_id
-  where r.rank <> 'Super Owner';
+  where r.rank <> 'Super Owner'
+     or (r.user_id = v_uid and v_rank = 'Super Owner');
 
   -- Admin is intentionally limited to announcements only.
   if v_rank <> 'Admin' then
@@ -293,7 +295,7 @@ begin
   where (v_query = ''
       or coalesce(p.display_name,'') ilike '%' || v_query || '%'
       or coalesce(p.character_name,'') ilike '%' || v_query || '%')
-    and coalesce(r.rank,'') <> 'Super Owner'
+    and (coalesce(r.rank,'') <> 'Super Owner' or (p.id = v_uid and v_rank = 'Super Owner'))
   order by coalesce(r.rank,'') desc, p.display_name
   limit 50;
 end;
