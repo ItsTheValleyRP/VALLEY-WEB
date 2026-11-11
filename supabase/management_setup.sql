@@ -42,15 +42,41 @@ create table if not exists public.valley_announcements (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.valley_website_settings (
+  id text primary key check (id = 'main'),
+  settings jsonb not null default '{}'::jsonb,
+  updated_by uuid references auth.users(id) on delete set null,
+  updated_at timestamptz not null default now()
+);
+
+insert into public.valley_website_settings (id, settings)
+values ('main', jsonb_build_object(
+  'site_title','VALLEY Roleplay',
+  'hero_eyebrow','YOUR STORY STARTS HERE',
+  'hero_title_line1','WELCOME TO',
+  'hero_title_line2','VALLEY.',
+  'hero_description','Step into a world built around immersive roleplay, meaningful stories, and a community where every decision can change what happens next.',
+  'hero_primary_text','Join the community',
+  'hero_primary_url','https://discord.gg/ERkMvmfDm',
+  'hero_secondary_text','Explore the rules',
+  'footer_tagline','YOUR STORY. YOUR CITY. YOUR VALLEY.',
+  'theme_primary','#78c9ff',
+  'theme_background','#06152f',
+  'theme_text','#edf7ff'
+))
+on conflict (id) do nothing;
+
 alter table public.valley_staff_roles enable row level security;
 alter table public.valley_staff_audit enable row level security;
 alter table public.valley_announcements enable row level security;
+alter table public.valley_website_settings enable row level security;
 
 -- No direct table access from the browser. All privileged access goes through
 -- narrowly scoped functions below, which verify auth.uid() and the caller's rank.
 revoke all on public.valley_staff_roles from anon, authenticated;
 revoke all on public.valley_staff_audit from anon, authenticated;
 revoke all on public.valley_announcements from anon, authenticated;
+revoke all on public.valley_website_settings from anon, authenticated;
 
 -- Bootstrap the one Super Owner using the Auth UID supplied by the site owner.
 -- This account is hidden from every other staff member by the functions below.
@@ -360,6 +386,75 @@ as $$
   limit 50;
 $$;
 
+create or replace function public.valley_public_website_settings()
+returns jsonb
+language sql
+security definer
+stable
+set search_path = public, pg_temp
+as $$
+  select settings from public.valley_website_settings where id = 'main';
+$$;
+
+create or replace function public.valley_management_save_website_settings(p_settings jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  v_uid uuid := auth.uid();
+  v_rank text;
+  v_existing jsonb;
+  v_key text;
+  v_value text;
+  v_allowed text[] := array[
+    'site_title','hero_eyebrow','hero_title_line1','hero_title_line2',
+    'hero_description','hero_primary_text','hero_primary_url',
+    'hero_secondary_text','footer_tagline',
+    'theme_primary','theme_background','theme_text'
+  ];
+begin
+  if v_uid is null then raise exception 'Authentication required'; end if;
+  select rank into v_rank from public.valley_staff_roles where user_id = v_uid;
+  if public.valley_management_rank_level(v_rank) < 60 then
+    raise exception 'Website editing is available to Management and higher only';
+  end if;
+  if p_settings is null or jsonb_typeof(p_settings) <> 'object' then
+    raise exception 'Invalid website settings';
+  end if;
+
+  for v_key in select jsonb_object_keys(p_settings) loop
+    if not (v_key = any(v_allowed)) then raise exception 'Unsupported website setting: %',v_key; end if;
+    if jsonb_typeof(p_settings->v_key) <> 'string' then raise exception 'Website settings must be text'; end if;
+    v_value := p_settings->>v_key;
+    if char_length(v_value) > 2000 then raise exception 'A website field is too long'; end if;
+    if v_key in ('theme_primary','theme_background','theme_text')
+       and v_value !~ '^#[0-9A-Fa-f]{6}$' then
+      raise exception 'Theme colours must be six-digit hex values';
+    end if;
+    if v_key = 'hero_primary_url' and v_value !~ '^https?://' then
+      raise exception 'Button links must start with http:// or https://';
+    end if;
+  end loop;
+
+  select settings into v_existing from public.valley_website_settings where id='main' for update;
+  if v_existing is null then v_existing := '{}'::jsonb; end if;
+  insert into public.valley_website_settings(id,settings,updated_by,updated_at)
+  values('main',v_existing || p_settings,v_uid,now())
+  on conflict(id) do update
+    set settings = public.valley_website_settings.settings || excluded.settings,
+        updated_by = excluded.updated_by,
+        updated_at = now()
+  returning settings into v_existing;
+
+  insert into public.valley_staff_audit(actor_user_id,action,details)
+  values(v_uid,'website_settings_updated',jsonb_build_object('fields',p_settings));
+
+  return v_existing;
+end;
+$$;
+
 revoke all on function public.valley_management_rank_level(text) from public, anon, authenticated;
 revoke all on function public.valley_management_overview() from public, anon;
 revoke all on function public.valley_management_set_rank(uuid,text) from public, anon;
@@ -367,6 +462,8 @@ revoke all on function public.valley_management_search_members(text) from public
 revoke all on function public.valley_management_remove_staff(uuid) from public, anon;
 revoke all on function public.valley_management_create_announcement(text,text,boolean) from public, anon;
 revoke all on function public.valley_public_announcements() from public;
+revoke all on function public.valley_public_website_settings() from public;
+revoke all on function public.valley_management_save_website_settings(jsonb) from public, anon;
 
 grant execute on function public.valley_management_overview() to authenticated;
 grant execute on function public.valley_management_set_rank(uuid,text) to authenticated;
@@ -374,6 +471,8 @@ grant execute on function public.valley_management_search_members(text) to authe
 grant execute on function public.valley_management_remove_staff(uuid) to authenticated;
 grant execute on function public.valley_management_create_announcement(text,text,boolean) to authenticated;
 grant execute on function public.valley_public_announcements() to anon, authenticated;
+grant execute on function public.valley_public_website_settings() to anon, authenticated;
+grant execute on function public.valley_management_save_website_settings(jsonb) to authenticated;
 
 commit;
 
