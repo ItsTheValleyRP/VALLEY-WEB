@@ -23,7 +23,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 .announcegrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}.announcement{padding:15px;border:1px solid var(--line);border-radius:11px;margin-bottom:10px;background:rgba(5,18,32,.4)}.announcement h3{margin:0 0 6px;font-size:15px}.announcement p{white-space:pre-wrap;color:#b9c9db;margin:0;font-size:13px}.status{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:800}.status.pending{color:#ffd27a}.status.rejected{color:#ff9292}.logline{padding:12px 0;border-bottom:1px solid var(--line);font-size:13px}.logline:last-child{border:0}.logline small{display:block;color:var(--muted);margin-top:3px}
 @media(max-width:760px){.heading{align-items:start;flex-direction:column}.stats{grid-template-columns:1fr}.announcegrid{grid-template-columns:1fr}.topright{gap:9px}.wrap{margin-top:25px}.panel{padding:16px}.result{align-items:flex-start;flex-direction:column}.searchrow{flex-direction:column}}
 
-.page-editor-page{display:grid;gap:14px}.editor-group{border:1px solid var(--line);border-radius:12px;padding:16px;background:rgba(5,18,32,.35)}.editor-group h4{margin:0 0 12px;font-size:14px;color:#d9eaff}.editor-field{display:grid;gap:5px;margin:10px 0}.editor-field>span,.editor-label{font-size:12px;color:var(--muted)}.editor-field textarea{min-height:85px}.editor-items{display:grid;gap:10px;margin-top:10px}.editor-item{border:1px solid rgba(150,190,230,.12);border-radius:10px;padding:13px;background:rgba(7,24,43,.55)}.editor-item-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.editor-item-head strong{font-size:12px;color:#cde4ff}.editor-actions{display:flex;gap:7px;flex-wrap:wrap}.editor-actions button{padding:7px 10px;font-size:11px}.editor-add{margin-top:10px}.page-editor-tabs{margin:14px 0}
+.page-editor-page{display:grid;gap:14px}.editor-group{border:1px solid var(--line);border-radius:12px;padding:16px;background:rgba(5,18,32,.35)}.editor-group h4{margin:0 0 12px;font-size:14px;color:#d9eaff}.editor-field{display:grid;gap:5px;margin:10px 0}.editor-field>span,.editor-label{font-size:12px;color:var(--muted)}.editor-field textarea{min-height:85px}.editor-items{display:grid;gap:10px;margin-top:10px}.editor-item{border:1px solid rgba(150,190,230,.12);border-radius:10px;padding:13px;background:rgba(7,24,43,.55)}.editor-item-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.editor-item-head strong{font-size:12px;color:#cde4ff}.editor-actions{display:flex;gap:7px;flex-wrap:wrap}.editor-actions button{padding:7px 10px;font-size:11px}.editor-add{margin-top:10px}.page-editor-tabs{margin:14px 0}.editor-page-tab{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:10px 15px;cursor:pointer;font-weight:600}.editor-page-tab.active{background:rgba(75,157,255,.15);color:#cce4ff;border-color:rgba(75,157,255,.42)}
 </style>
 </head>
 <body>
@@ -105,10 +105,10 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 <h3 style="margin-top:0">Edit page wording</h3>
 <p class="muted">Choose a page and change the wording directly. You do not need to edit code or formatting. Use the add and remove buttons for cards, guide entries, rule categories and individual rules.</p>
 <div class="tabs page-editor-tabs" id="page-editor-tabs">
-<button type="button" class="tab active" data-editor-page="home">Home</button>
-<button type="button" class="tab" data-editor-page="guide">Guide</button>
-<button type="button" class="tab" data-editor-page="rules">Rules</button>
-<button type="button" class="tab" data-editor-page="about">About</button>
+<button type="button" class="editor-page-tab active" data-editor-page="home">Home</button>
+<button type="button" class="editor-page-tab" data-editor-page="guide">Guide</button>
+<button type="button" class="editor-page-tab" data-editor-page="rules">Rules</button>
+<button type="button" class="editor-page-tab" data-editor-page="about">About</button>
 </div>
 <div id="page-editor-home" class="page-editor-page"></div>
 <div id="page-editor-guide" class="page-editor-page hidden"></div>
@@ -398,9 +398,10 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    if(pageDrafts[page])renderObjectEditor(pageDrafts[page],[page],root);
   });
  }
- document.querySelectorAll('[data-editor-page]').forEach(button=>button.addEventListener('click',()=>{
-  document.querySelectorAll('[data-editor-page]').forEach(b=>b.classList.toggle('active',b===button));
-  ['home','guide','rules','about'].forEach(page=>show($('page-editor-'+page),page===button.dataset.editorPage));
+ document.querySelectorAll('#page-editor-tabs .editor-page-tab').forEach(button=>button.addEventListener('click',event=>{
+  event.preventDefault();
+  document.querySelectorAll('#page-editor-tabs .editor-page-tab').forEach(b=>b.classList.toggle('active',b===button));
+  ['home','guide','rules','about'].forEach(page=>{const panel=$('page-editor-'+page);if(panel)panel.classList.toggle('hidden',page!==button.dataset.editorPage);});
  }));
  async function loadWebsiteSettings(){
    const {data,error}=await client.rpc('valley_public_website_settings');
