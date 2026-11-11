@@ -62,8 +62,8 @@ body{background-image:radial-gradient(ellipse at 18% 22%,#0c4b7b2a,transparent 3
 .quick-link:hover{color:var(--purple);padding-left:8px}
 .home-dashboard+.text-link{margin-top:20px}
 .home-dashboard~.kicker{text-align:center}
-#home>.wrap:first-of-type>.kicker,#home>.wrap:first-of-type>.section-title{text-align:center}
-#home>.wrap:first-of-type>.lead{text-align:center;max-width:620px;margin:0 auto}
+#home>.wrap:not(.closing)>.kicker,#home>.wrap:first-of-type>.section-title{text-align:center}
+#home>.wrap:not(.closing)>.lead{text-align:center;max-width:620px;margin:0 auto}
 #home .features .kicker{text-align:center}
 #home .feature-grid{max-width:1080px;margin:38px auto 0}
 #home .closing{max-width:1120px}
@@ -414,10 +414,10 @@ const mobile=document.getElementById('mobile');mobile.innerHTML=['home','guide',
    const home=pages.home;
    if(home){
      const root=document.getElementById('home');
-     set('#home>.wrap:first-of-type>.kicker',home.intro_kicker);
-     const introTitle=root.querySelector('.wrap:first-of-type .section-title');
+     set('#home>.wrap:not(.closing)>.kicker',home.intro_kicker);
+     const introTitle=root.querySelector('.wrap:not(.closing) .section-title');
      if(introTitle){introTitle.innerHTML=esc(home.intro_title_line1||'WELCOME TO')+' <em>'+esc(home.intro_title_highlight||'VALLEY.')+'</em>';}
-     set('#home>.wrap:first-of-type>.lead',home.intro_description);
+     set('#home>.wrap:not(.closing)>.lead',home.intro_description);
      if(Array.isArray(home.features)){
        const grid=root.querySelector('.features .feature-grid');
        grid.innerHTML=home.features.map((feature,i)=>'<article class="feature"><span class="symbol">'+esc(feature.symbol||'✦')+'</span><span class="num">'+String(i+1).padStart(2,'0')+'</span><h3>'+esc(feature.title||'')+'</h3><p>'+esc(feature.description||'')+'</p></article>').join('');
