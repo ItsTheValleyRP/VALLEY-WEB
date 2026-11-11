@@ -22,6 +22,8 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 .resultlist{display:grid;gap:9px}.result{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:13px;background:rgba(5,18,32,.48);border:1px solid var(--line);border-radius:11px}.resultname{min-width:0}.resultname strong{display:block}.resultname small{color:var(--muted);overflow-wrap:anywhere}.empty{color:var(--muted);padding:22px;text-align:center;border:1px dashed var(--line);border-radius:11px}
 .announcegrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}.announcement{padding:15px;border:1px solid var(--line);border-radius:11px;margin-bottom:10px;background:rgba(5,18,32,.4)}.announcement h3{margin:0 0 6px;font-size:15px}.announcement p{white-space:pre-wrap;color:#b9c9db;margin:0;font-size:13px}.status{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--green);font-weight:800}.status.pending{color:#ffd27a}.status.rejected{color:#ff9292}.logline{padding:12px 0;border-bottom:1px solid var(--line);font-size:13px}.logline:last-child{border:0}.logline small{display:block;color:var(--muted);margin-top:3px}
 @media(max-width:760px){.heading{align-items:start;flex-direction:column}.stats{grid-template-columns:1fr}.announcegrid{grid-template-columns:1fr}.topright{gap:9px}.wrap{margin-top:25px}.panel{padding:16px}.result{align-items:flex-start;flex-direction:column}.searchrow{flex-direction:column}}
+
+.page-editor-page{display:grid;gap:14px}.editor-group{border:1px solid var(--line);border-radius:12px;padding:16px;background:rgba(5,18,32,.35)}.editor-group h4{margin:0 0 12px;font-size:14px;color:#d9eaff}.editor-field{display:grid;gap:5px;margin:10px 0}.editor-field>span,.editor-label{font-size:12px;color:var(--muted)}.editor-field textarea{min-height:85px}.editor-items{display:grid;gap:10px;margin-top:10px}.editor-item{border:1px solid rgba(150,190,230,.12);border-radius:10px;padding:13px;background:rgba(7,24,43,.55)}.editor-item-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}.editor-item-head strong{font-size:12px;color:#cde4ff}.editor-actions{display:flex;gap:7px;flex-wrap:wrap}.editor-actions button{padding:7px 10px;font-size:11px}.editor-add{margin-top:10px}.page-editor-tabs{margin:14px 0}
 </style>
 </head>
 <body>
@@ -100,15 +102,19 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 </div>
 </div>
 <div class="panel" style="margin-top:22px">
-<h3 style="margin-top:0">Page content editor</h3>
-<p class="muted">Edit the Guide, Rules and About content below. These fields use formatted JSON so you can add, remove, or reorder entries and categories. Keep the field names and quote marks in place. The current website content is loaded as your starting point.</p>
-<div style="display:grid;grid-template-columns:1fr;gap:14px">
-<label class="muted" for="web-home-json">Homepage sections and feature cards<textarea id="web-home-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:260px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
-<label class="muted" for="web-guide-json">Guide entries and headings<textarea id="web-guide-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:260px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
-<label class="muted" for="web-rules-json">Rules categories and individual rules<textarea id="web-rules-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:360px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
-<label class="muted" for="web-about-json">About page content<textarea id="web-about-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:240px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
+<h3 style="margin-top:0">Edit page wording</h3>
+<p class="muted">Choose a page and change the wording directly. You do not need to edit code or formatting. Use the add and remove buttons for cards, guide entries, rule categories and individual rules.</p>
+<div class="tabs page-editor-tabs" id="page-editor-tabs">
+<button type="button" class="tab active" data-editor-page="home">Home</button>
+<button type="button" class="tab" data-editor-page="guide">Guide</button>
+<button type="button" class="tab" data-editor-page="rules">Rules</button>
+<button type="button" class="tab" data-editor-page="about">About</button>
 </div>
-<p class="muted" style="font-size:12px">Tip: use a JSON formatter if you want to make large edits easier. Text is displayed as text on the public website; it is not treated as HTML or code.</p>
+<div id="page-editor-home" class="page-editor-page"></div>
+<div id="page-editor-guide" class="page-editor-page hidden"></div>
+<div id="page-editor-rules" class="page-editor-page hidden"></div>
+<div id="page-editor-about" class="page-editor-page hidden"></div>
+<p class="muted" style="font-size:12px;margin-bottom:0">Your edits are saved when you press SAVE WEBSITE CHANGES below.</p>
 </div>
 <h3>Website colours</h3>
 <div class="announcegrid">
@@ -332,6 +338,70 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    const about={...heading(aboutRoot),card_kicker:aboutRoot.querySelector('.about .kicker')?.textContent.trim()||'',card_title_line1:'EVERY PLAYER',card_title_line2:'HAS A STORY.',paragraphs,link_text:(aboutRoot.querySelector('.about a')?.textContent||'Become part of it').replace(/\s*↗$/,''),link_url:aboutRoot.querySelector('.about a')?.href||''};
    return {home,guide,rules,about};
  }
+
+ let pageDrafts={};
+ const fieldNames={
+  intro_kicker:'Small heading',intro_title_line1:'Main heading',intro_title_highlight:'Highlighted heading',intro_description:'Description',
+  closing_kicker:'Closing small heading',closing_line1:'Closing heading line 1',closing_line2:'Closing heading line 2',closing_highlight:'Closing highlighted text',closing_button_text:'Button wording',closing_url:'Button link',
+  kicker:'Small heading',title_line1:'Main heading',title_highlight:'Highlighted heading',description:'Description',
+  signoff_kicker:'Closing small heading',signoff_line1:'Closing heading',signoff_highlight:'Highlighted text',
+  intro_line1:'Intro heading',intro_highlight:'Highlighted heading',intro_description:'Intro description',end_title:'Closing title',end_description:'Closing message',invite_url:'Invite link',
+  card_kicker:'Card small heading',card_title_line1:'Card heading line 1',card_title_line2:'Card heading line 2',link_text:'Link wording',link_url:'Link URL',
+  symbol:'Icon / symbol',title:'Title',description:'Description',icon:'Icon / symbol',subtitle:'Subtitle',body:'Text',paragraphs:'Paragraphs',features:'Feature cards',entries:'Guide entries',categories:'Rule categories',rules:'Rules'
+ };
+ const prettyKey=k=>fieldNames[k]||k.replaceAll('_',' ').replace(/\b\w/g,x=>x.toUpperCase());
+ const clone=value=>JSON.parse(JSON.stringify(value));
+ const templates={
+  features:{symbol:'✦',title:'New feature',description:'Add a short description.'},
+  entries:{icon:'✦',kicker:'NEW / CITY GUIDE',title:'New guide entry',subtitle:'',body:'Add guide wording here.'},
+  categories:{title:'New category',description:'',rules:[]},
+  rules:{title:'New rule',description:''},
+  paragraphs:'Add a paragraph here.'
+ };
+ const makeEditorField=(label,value,onChange)=>{
+  const wrap=document.createElement('label');wrap.className='editor-field';const caption=document.createElement('span');caption.textContent=label;wrap.append(caption);
+  const multiline=String(value??'').length>105||/description|body|paragraph|message/i.test(label);
+  const input=document.createElement(multiline?'textarea':'input');input.className='field';input.value=value??'';input.maxLength=multiline?4000:500;
+  input.addEventListener('input',()=>onChange(input.value));wrap.append(input);return wrap;
+ };
+ const renderObjectEditor=(obj,path,container)=>{
+  Object.entries(obj||{}).forEach(([key,value])=>{
+   if(Array.isArray(value)){
+    const group=document.createElement('div');group.className='editor-group';const heading=document.createElement('h4');heading.textContent=prettyKey(key);group.append(heading);
+    const items=document.createElement('div');items.className='editor-items';
+    value.forEach((item,index)=>{
+     const card=document.createElement('div');card.className='editor-item';const head=document.createElement('div');head.className='editor-item-head';
+     const name=document.createElement('strong');name.textContent=prettyKey(key).replace(/s$/,'')+' '+(index+1);head.append(name);
+     const actions=document.createElement('div');actions.className='editor-actions';
+     const remove=document.createElement('button');remove.type='button';remove.className='danger';remove.textContent='REMOVE';remove.addEventListener('click',()=>{value.splice(index,1);renderPageEditors();});
+     const up=document.createElement('button');up.type='button';up.className='secondary';up.textContent='↑';up.disabled=index===0;up.addEventListener('click',()=>{[value[index-1],value[index]]=[value[index],value[index-1]];renderPageEditors();});
+     const down=document.createElement('button');down.type='button';down.className='secondary';down.textContent='↓';down.disabled=index===value.length-1;down.addEventListener('click',()=>{[value[index+1],value[index]]=[value[index],value[index+1]];renderPageEditors();});
+     actions.append(up,down,remove);head.append(actions);card.append(head);
+     if(item&&typeof item==='object'&&!Array.isArray(item))renderObjectEditor(item,path.concat(key,index),card);
+     else card.append(makeEditorField('Wording',item,next=>{value[index]=next;}));
+     items.append(card);
+    });
+    group.append(items);
+    const add=document.createElement('button');add.type='button';add.className='secondary editor-add';add.textContent='+ ADD '+prettyKey(key).replace(/s$/,'').toUpperCase();
+    add.addEventListener('click',()=>{const sample=value.length?value[value.length-1]:templates[key];if(sample===undefined){alert('This section has no starter template yet.');return;}value.push(clone(sample));renderPageEditors();});
+    group.append(add);container.append(group);
+   }else if(value!==null&&typeof value==='object'){
+    const group=document.createElement('div');group.className='editor-group';const heading=document.createElement('h4');heading.textContent=prettyKey(key);group.append(heading);renderObjectEditor(value,path.concat(key),group);container.append(group);
+   }else{
+    const field=makeEditorField(prettyKey(key),value,next=>{obj[key]=next;});container.append(field);
+   }
+  });
+ };
+ function renderPageEditors(){
+  ['home','guide','rules','about'].forEach(page=>{
+   const root=$('page-editor-'+page);root.replaceChildren();
+   if(pageDrafts[page])renderObjectEditor(pageDrafts[page],[page],root);
+  });
+ }
+ document.querySelectorAll('[data-editor-page]').forEach(button=>button.addEventListener('click',()=>{
+  document.querySelectorAll('[data-editor-page]').forEach(b=>b.classList.toggle('active',b===button));
+  ['home','guide','rules','about'].forEach(page=>show($('page-editor-'+page),page===button.dataset.editorPage));
+ }));
  async function loadWebsiteSettings(){
    const {data,error}=await client.rpc('valley_public_website_settings');
    if(error){$('website-save-error').textContent=error.message;return;}
@@ -339,10 +409,8 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    try{
      const defaults=await loadDefaultPageContent();
      const pages=siteSettings.pages||defaults;
-     $('web-home-json').value=JSON.stringify(pages.home||defaults.home,null,2);
-     $('web-guide-json').value=JSON.stringify(pages.guide||defaults.guide,null,2);
-     $('web-rules-json').value=JSON.stringify(pages.rules||defaults.rules,null,2);
-     $('web-about-json').value=JSON.stringify(pages.about||defaults.about,null,2);
+     pageDrafts={home:clone(pages.home||defaults.home),guide:clone(pages.guide||defaults.guide),rules:clone(pages.rules||defaults.rules),about:clone(pages.about||defaults.about)};
+     renderPageEditors();
    }catch(e){$('website-save-error').textContent='Page editor could not load current content: '+e.message;}
 
    const fields={
@@ -373,12 +441,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
      theme_primary:$('web-color-primary').value,
      theme_background:$('web-color-background').value,
      theme_text:$('web-color-text').value,
-     pages:{
-       home:JSON.parse($('web-home-json').value),
-       guide:JSON.parse($('web-guide-json').value),
-       rules:JSON.parse($('web-rules-json').value),
-       about:JSON.parse($('web-about-json').value)
-     }
+     pages:clone(pageDrafts)
    };
    }catch(e){$('website-save-error').textContent='Please correct the page JSON: '+e.message;button.disabled=false;button.textContent='SAVE WEBSITE CHANGES';return;}
    const {data,error}=await client.rpc('valley_management_save_website_settings',{p_settings:settings});
