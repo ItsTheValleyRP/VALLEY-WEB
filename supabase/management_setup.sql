@@ -261,6 +261,44 @@ begin
 end;
 $$;
 
+create or replace function public.valley_management_search_members(p_query text default '')
+returns table (
+  user_id uuid,
+  display_name text,
+  character_name text,
+  staff_rank text
+)
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $
+declare
+  v_uid uuid := auth.uid();
+  v_rank text;
+  v_query text := trim(coalesce(p_query,''));
+begin
+  if v_uid is null then raise exception 'Authentication required'; end if;
+  select rank into v_rank from public.valley_staff_roles where user_id = v_uid;
+  if v_rank is null or v_rank = 'Admin' then
+    raise exception 'You do not have member-search access';
+  end if;
+
+  return query
+  select p.id,
+         coalesce(p.display_name,'Discord member'),
+         coalesce(p.character_name,''),
+         r.rank
+  from public.profiles p
+  left join public.valley_staff_roles r on r.user_id = p.id
+  where (v_query = ''
+      or coalesce(p.display_name,'') ilike '%' || v_query || '%'
+      or coalesce(p.character_name,'') ilike '%' || v_query || '%')
+    and coalesce(r.rank,'') <> 'Super Owner'
+  order by coalesce(r.rank,'') desc, p.display_name
+  limit 50;
+end;
+$;
+
 create or replace function public.valley_management_create_announcement(
   p_title text,
   p_body text,
@@ -320,12 +358,14 @@ $$;
 revoke all on function public.valley_management_rank_level(text) from public, anon, authenticated;
 revoke all on function public.valley_management_overview() from public, anon;
 revoke all on function public.valley_management_set_rank(uuid,text) from public, anon;
+revoke all on function public.valley_management_search_members(text) from public, anon;
 revoke all on function public.valley_management_remove_staff(uuid) from public, anon;
 revoke all on function public.valley_management_create_announcement(text,text,boolean) from public, anon;
 revoke all on function public.valley_public_announcements() from public;
 
 grant execute on function public.valley_management_overview() to authenticated;
 grant execute on function public.valley_management_set_rank(uuid,text) to authenticated;
+grant execute on function public.valley_management_search_members(text) to authenticated;
 grant execute on function public.valley_management_remove_staff(uuid) to authenticated;
 grant execute on function public.valley_management_create_announcement(text,text,boolean) to authenticated;
 grant execute on function public.valley_public_announcements() to anon, authenticated;
