@@ -15,7 +15,7 @@ alter table public.valley_announcements
 -- Preserve existing public announcements as approved; un-published entries
 -- become pending review so none can accidentally appear publicly.
 update public.valley_announcements
-set review_status = case when published then 'approved' else 'pending' end;
+set review_status = 'approved' where published = true;
 
 -- Replace the old immediate-publish function. All new submissions are pending.
 drop function if exists public.valley_management_create_announcement(text,text,boolean);
@@ -72,7 +72,7 @@ begin
   if public.valley_management_rank_level(v_rank) < 70 then
     raise exception 'Only Assistant Director or higher can review announcements';
   end if;
-  if p_decision not in ('approved','rejected') then
+  if p_decision is null or p_decision not in ('approved','rejected') then
     raise exception 'Invalid review decision';
   end if;
 
