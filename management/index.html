@@ -313,7 +313,9 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
  $('website-save').addEventListener('click',async()=>{
    const button=$('website-save');button.disabled=true;button.textContent='SAVING...';
    $('website-save-error').textContent='';$('website-save-status').textContent='';
-   const settings={
+   let settings;
+   try{
+     settings={
      hero_eyebrow:$('web-hero-eyebrow').value.trim(),
      hero_title_line1:$('web-title-one').value.trim(),
      hero_title_line2:$('web-title-two').value.trim(),
@@ -332,8 +334,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
        about:JSON.parse($('web-about-json').value)
      }
    };
-   let parsedSettings;
-   try{parsedSettings=settings;}catch(e){$('website-save-error').textContent='Please correct the page JSON: '+e.message;button.disabled=false;button.textContent='SAVE WEBSITE CHANGES';return;}
+   }catch(e){$('website-save-error').textContent='Please correct the page JSON: '+e.message;button.disabled=false;button.textContent='SAVE WEBSITE CHANGES';return;}
    const {data,error}=await client.rpc('valley_management_save_website_settings',{p_settings:settings});
    button.disabled=false;button.textContent='SAVE WEBSITE CHANGES';
    if(error){$('website-save-error').textContent=error.message;return;}
