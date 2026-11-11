@@ -393,4 +393,42 @@ const mobile=document.getElementById('mobile');mobile.innerHTML=['home','guide',
  });
 })();
 </script>
+
+<script>
+// Public website settings are read from Supabase so management saves go live
+// without another GitHub Pages deployment.
+(()=>{
+ if(!window.supabase)return;
+ const client=window.supabase.createClient('https://bqibeyeltgijvjghtnve.supabase.co','sb_publishable_Pb8W_qAqJPTCKV_cnoqgXg_aP_9fgXt');
+ const apply=settings=>{
+   if(!settings)return;
+   const setText=(selector,value)=>{const el=document.querySelector(selector);if(el&&typeof value==='string')el.textContent=value;};
+   setText('.hero .eyebrow',settings.hero_eyebrow);
+   const heading=document.querySelector('.hero h1');
+   if(heading){
+     const firstText=[...heading.childNodes].find(n=>n.nodeType===Node.TEXT_NODE);
+     if(firstText&&settings.hero_title_line1)firstText.nodeValue=settings.hero_title_line1;
+     const highlight=heading.querySelector('em');
+     if(highlight&&settings.hero_title_line2)highlight.textContent=settings.hero_title_line2;
+   }
+   setText('.hero > div:first-child > p',settings.hero_description);
+   const primary=document.querySelector('.hero .actions a.primary');
+   if(primary){
+     if(settings.hero_primary_text)primary.textContent=settings.hero_primary_text+' ↗';
+     if(typeof settings.hero_primary_url==='string'&&/^https?:\/\//i.test(settings.hero_primary_url))primary.href=settings.hero_primary_url;
+   }
+   const secondary=document.querySelector('.hero .actions button.secondary');
+   if(secondary&&settings.hero_secondary_text)secondary.textContent=settings.hero_secondary_text+' →';
+   setText('.footer-top > p',settings.footer_tagline);
+   if(settings.site_title)document.title=settings.site_title;
+   const root=document.documentElement;
+   if(settings.theme_primary)root.style.setProperty('--purple',settings.theme_primary);
+   if(settings.theme_background)root.style.setProperty('--bg',settings.theme_background);
+   if(settings.theme_text)root.style.setProperty('--text',settings.theme_text);
+ };
+ const refresh=()=>client.rpc('valley_public_website_settings').then(({data,error})=>{if(!error)apply(data);});
+ refresh();
+ window.setInterval(refresh,30000);
+})();
+</script>
 </body></html>
