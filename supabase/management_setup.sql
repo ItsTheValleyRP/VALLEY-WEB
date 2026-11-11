@@ -4,6 +4,8 @@
 
 begin;
 
+grant usage on schema public to anon, authenticated;
+
 create table if not exists public.valley_staff_roles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   rank text not null check (rank in (
