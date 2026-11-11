@@ -140,8 +140,7 @@ begin
     'updated_at', a.updated_at
   ) order by a.created_at desc), '[]'::jsonb)
   into v_announcements
-  from public.valley_announcements a
-  order by a.created_at desc;
+  from public.valley_announcements a;
 
   return jsonb_build_object(
     'my_rank', v_rank,
