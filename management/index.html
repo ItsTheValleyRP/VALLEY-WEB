@@ -149,7 +149,8 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
      const tr=document.createElement('tr');
      const name=document.createElement('td');name.append(makeCell('strong',m.display_name),makeCell('small','Account: '+m.user_id));tr.append(name);
      tr.append(makeCell('td',m.character_name||'—'));
-     tr.append(makeCell('td',m.rank,'role'));
+     const visibleRank=m.rank==='Super Owner'&&overview.my_rank!=='Super Owner'?'Staff':m.rank;
+     tr.append(makeCell('td',visibleRank,'role'));
      tr.append(makeCell('td',formatDate(m.created_at)));
      body.append(tr);
    });
