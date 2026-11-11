@@ -103,6 +103,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 <h3 style="margin-top:0">Page content editor</h3>
 <p class="muted">Edit the Guide, Rules and About content below. These fields use formatted JSON so you can add, remove, or reorder entries and categories. Keep the field names and quote marks in place. The current website content is loaded as your starting point.</p>
 <div style="display:grid;grid-template-columns:1fr;gap:14px">
+<label class="muted" for="web-home-json">Homepage sections and feature cards<textarea id="web-home-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:260px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
 <label class="muted" for="web-guide-json">Guide entries and headings<textarea id="web-guide-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:260px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
 <label class="muted" for="web-rules-json">Rules categories and individual rules<textarea id="web-rules-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:360px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
 <label class="muted" for="web-about-json">About page content<textarea id="web-about-json" class="field" spellcheck="false" style="display:block;width:100%;min-height:240px;margin-top:7px;font:12px/1.55 ui-monospace,monospace"></textarea></label>
@@ -269,6 +270,28 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    const response=await fetch('../index.html',{cache:'no-store'});
    if(!response.ok)throw new Error('Could not load the current website content.');
    const doc=new DOMParser().parseFromString(await response.text(),'text/html');
+   const homeRoot=doc.getElementById('home');
+   const homeIntro=homeRoot.querySelector('.wrap:first-of-type');
+   const homeTitle=homeIntro.querySelector('.section-title');
+   const homeFeatures=[...homeRoot.querySelectorAll('.features .feature')].map(feature=>({
+     symbol:feature.querySelector('.symbol')?.textContent.trim()||'✦',
+     title:feature.querySelector('h3')?.textContent.trim()||'',
+     description:feature.querySelector('p')?.textContent.trim()||''
+   }));
+   const closing=homeRoot.querySelector('.closing'),closingTitle=closing.querySelector('h2');
+   const home={
+     intro_kicker:homeIntro.querySelector('.kicker')?.textContent.trim()||'',
+     intro_title_line1:homeTitle.childNodes[0]?.textContent.trim()||'',
+     intro_title_highlight:homeTitle.querySelector('em')?.textContent.trim()||'',
+     intro_description:homeIntro.querySelector('.lead')?.textContent.trim()||'',
+     features:homeFeatures,
+     closing_kicker:closing.querySelector('.kicker')?.textContent.trim()||'',
+     closing_line1:closingTitle.childNodes[0]?.textContent.trim()||'',
+     closing_line2:closingTitle.childNodes[2]?.textContent.trim()||'',
+     closing_highlight:closingTitle.querySelector('em')?.textContent.trim()||'',
+     closing_button_text:(closing.querySelector('a')?.textContent||'Join our Discord').replace(/\s*↗$/,''),
+     closing_url:closing.querySelector('a')?.href||''
+   };
    const rulesNode=doc.getElementById('valley-default-rules');
    if(!rulesNode)throw new Error('Could not load the default rules.');
    const rulesRaw=JSON.parse(rulesNode.textContent);
@@ -286,7 +309,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    const rules={...heading(rulesRoot),categories:rulesRaw.map(r=>({title:r[0],description:r[1],rules:r[2].map(x=>({title:x[0],description:x[1]}))})),intro_kicker:rulesRoot.querySelector('.rules-intro .kicker')?.textContent.trim()||'',intro_line1:'Respect the roleplay.',intro_highlight:'Respect each other.',intro_description:rulesRoot.querySelector('.rules-intro p')?.textContent.trim()||'',end_title:rulesRoot.querySelector('.end-note h3')?.textContent.trim()||'',end_description:rulesRoot.querySelector('.end-note p')?.textContent.trim()||'',invite_url:rulesRoot.querySelector('.end-note a')?.href||''};
    const aboutRoot=doc.getElementById('about'),paragraphs=[...aboutRoot.querySelectorAll('.about p')].map(p=>p.textContent.trim());
    const about={...heading(aboutRoot),card_kicker:aboutRoot.querySelector('.about .kicker')?.textContent.trim()||'',card_title_line1:'EVERY PLAYER',card_title_line2:'HAS A STORY.',paragraphs,link_text:(aboutRoot.querySelector('.about a')?.textContent||'Become part of it').replace(/\s*↗$/,''),link_url:aboutRoot.querySelector('.about a')?.href||''};
-   return {guide,rules,about};
+   return {home,guide,rules,about};
  }
  async function loadWebsiteSettings(){
    const {data,error}=await client.rpc('valley_public_website_settings');
@@ -295,6 +318,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    try{
      const defaults=await loadDefaultPageContent();
      const pages=siteSettings.pages||defaults;
+     $('web-home-json').value=JSON.stringify(pages.home||defaults.home,null,2);
      $('web-guide-json').value=JSON.stringify(pages.guide||defaults.guide,null,2);
      $('web-rules-json').value=JSON.stringify(pages.rules||defaults.rules,null,2);
      $('web-about-json').value=JSON.stringify(pages.about||defaults.about,null,2);
@@ -329,6 +353,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
      theme_background:$('web-color-background').value,
      theme_text:$('web-color-text').value,
      pages:{
+       home:JSON.parse($('web-home-json').value),
        guide:JSON.parse($('web-guide-json').value),
        rules:JSON.parse($('web-rules-json').value),
        about:JSON.parse($('web-about-json').value)
