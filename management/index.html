@@ -69,11 +69,11 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 </section>
 <section class="section" id="section-announcements">
 <div class="announcegrid">
-<div class="panel"><h2 style="margin-top:0">Create announcement</h2><p class="muted">Publish an update for the community.</p>
+<div class="panel"><h2 style="margin-top:0">Submit announcement</h2><p class="muted">Submit an update for review. It will only appear on the public website after Assistant Director or higher approves it.</p>
 <label class="muted" for="announcement-title">Title</label><input id="announcement-title" class="field" maxlength="120" placeholder="Announcement title" style="margin:6px 0 14px">
 <label class="muted" for="announcement-body">Message</label><textarea id="announcement-body" class="field" maxlength="12000" placeholder="Write your announcement..." style="margin:6px 0 14px"></textarea>
-<label style="display:flex;gap:9px;align-items:center;margin-bottom:15px"><input id="announcement-publish" type="checkbox" checked> Publish immediately</label>
-<button id="announcement-submit">POST ANNOUNCEMENT</button><div id="announcement-error" class="error" role="alert"></div><div id="announcement-success" class="notice hidden"></div>
+<div class="notice">All submissions start as <strong>UNDER REVIEW</strong>. Only Assistant Director or higher can approve them.</div>
+<button id="announcement-submit">SUBMIT FOR REVIEW</button><div id="announcement-error" class="error" role="alert"></div><div id="announcement-success" class="notice hidden"></div>
 </div>
 <div class="panel"><div class="sectionhead"><h2>Recent announcements</h2></div><div id="announcement-list"></div></div>
 </div>
@@ -186,9 +186,30 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    if(!items.length){root.append(makeCell('div','No announcements yet.','empty'));return;}
    items.forEach(a=>{
      const card=makeCell('article','','announcement');
-     const status=makeCell('div',a.published?'PUBLISHED':'DRAFT','status');
+     const state=a.review_status||(a.published?'approved':'pending');
+     const status=makeCell('div',state==='approved'?'APPROVED':state==='rejected'?'REJECTED':'UNDER REVIEW','status');
      const title=makeCell('h3',a.title);const body=makeCell('p',a.body);
-     card.append(status,title,body,makeCell('small',formatDate(a.created_at),'muted'));root.append(card);
+     card.append(status,title,body,makeCell('small',formatDate(a.created_at),'muted'));
+     if(['Assistant Director','Director','Staff Owner','Super Owner'].includes(overview.my_rank)&&state==='pending'){
+       const controls=makeCell('div','','actions');
+       const approve=makeCell('button','APPROVE');
+       approve.addEventListener('click',async()=>{
+         approve.disabled=true;
+         const {error}=await client.rpc('valley_management_review_announcement',{p_announcement_id:a.id,p_decision:'approved'});
+         if(error){alert(error.message);approve.disabled=false;return;}
+         await load();
+       });
+       const reject=makeCell('button','REJECT','danger');
+       reject.addEventListener('click',async()=>{
+         if(!confirm('Reject this announcement? It will not appear publicly.'))return;
+         reject.disabled=true;
+         const {error}=await client.rpc('valley_management_review_announcement',{p_announcement_id:a.id,p_decision:'rejected'});
+         if(error){alert(error.message);reject.disabled=false;return;}
+         await load();
+       });
+       controls.append(approve,reject);card.append(controls);
+     }
+     root.append(card);
    });
  };
  const render=()=>{
@@ -372,13 +393,12 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
    $('announcement-error').textContent='';show($('announcement-success'),false);
    const {data,error}=await client.rpc('valley_management_create_announcement',{
      p_title:$('announcement-title').value.trim(),
-     p_body:$('announcement-body').value.trim(),
-     p_publish:$('announcement-publish').checked
+     p_body:$('announcement-body').value.trim()
    });
    button.disabled=false;button.textContent='POST ANNOUNCEMENT';
    if(error){$('announcement-error').textContent=error.message;return;}
    $('announcement-title').value='';$('announcement-body').value='';
-   $('announcement-success').textContent='Announcement saved'+($('announcement-publish').checked?' and published':' as a draft')+'. Reference #'+data+'.';
+   $('announcement-success').textContent='Announcement submitted for review. It will remain hidden from the public website until Assistant Director or higher approves it. Reference #'+data+'.';
    show($('announcement-success'),true);await load();
  });
  client.auth.onAuthStateChange((_event,s)=>{setTimeout(()=>sync(s),0);});
