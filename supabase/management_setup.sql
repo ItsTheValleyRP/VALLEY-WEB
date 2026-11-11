@@ -112,6 +112,7 @@ begin
   left join public.profiles p on p.id = r.user_id
   where r.rank <> 'Super Owner'
      or (r.user_id = v_uid and v_rank = 'Super Owner');
+  end if;
 
   -- Admin is intentionally limited to announcements only.
   if v_rank <> 'Admin' then
