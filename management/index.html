@@ -189,7 +189,7 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
      else info.append(makeCell('small','Not currently on staff'));
      row.append(info);
      const options=allowedRanks(overview.my_rank);
-     if(options.length){
+     if(options.length && member.staff_rank!=='Super Owner'){
        const controls=makeCell('div','','actions');const select=document.createElement('select');select.className='field';
        select.append(new Option('Assign position...',''));
        options.forEach(r=>select.append(new Option(r,r)));
