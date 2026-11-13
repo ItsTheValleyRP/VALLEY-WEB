@@ -61,8 +61,8 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
 </section>
 <section class="section" id="section-search">
 <div class="panel"><div class="sectionhead"><h2>Find a community member</h2></div>
-<p class="muted">Search by Discord display name or in-city character name. Super Owner accounts are protected and never appear in search.</p>
-<div class="searchrow"><input id="member-query" class="field" placeholder="Search members..." maxlength="80"><button id="member-search">SEARCH</button></div>
+<p class="muted">Search by email, Discord display name, Discord username, or in-city character name. Super Owner accounts are protected and never appear in search.</p>
+<div class="searchrow"><input id="member-query" class="field" placeholder="Email, Discord name, username, or character name..." maxlength="120"><button id="member-search">SEARCH</button></div>
 <div id="search-results" class="resultlist"><div class="empty">Enter a name to search for a member.</div></div>
 </div>
 </section>
@@ -265,6 +265,19 @@ a{color:#9bcaff;text-decoration:none}a:hover{color:#fff}.top{height:72px;border-
      if(member.staff_rank)info.append(makeCell('small','Current position: '+member.staff_rank,'role'));
      else info.append(makeCell('small','Not currently on staff'));
      row.append(info);
+     const discordTools=makeCell('div','','actions');
+     const discordInput=document.createElement('input');discordInput.className='field';discordInput.placeholder='Discord username';discordInput.maxLength=100;discordInput.style.width='190px';discordInput.setAttribute('aria-label','Discord username for '+member.display_name);
+     const saveDiscord=makeCell('button','SAVE USERNAME','secondary');
+     saveDiscord.addEventListener('click',async()=>{
+       const username=discordInput.value.trim();
+       if(!username){alert('Enter a Discord username first.');return;}
+       saveDiscord.disabled=true;saveDiscord.textContent='SAVING...';
+       const {error}=await client.rpc('valley_management_set_discord_username',{p_target_user_id:member.user_id,p_discord_username:username});
+       if(error){alert(error.message);saveDiscord.disabled=false;saveDiscord.textContent='SAVE USERNAME';return;}
+       saveDiscord.textContent='SAVED';discordInput.value=username;
+       setTimeout(()=>{saveDiscord.disabled=false;saveDiscord.textContent='SAVE USERNAME';},1200);
+     });
+     discordTools.append(discordInput,saveDiscord);row.append(discordTools);
      const options=allowedRanks(overview.my_rank);
      if(options.length && member.staff_rank!=='Super Owner'){
        const controls=makeCell('div','','actions');const select=document.createElement('select');select.className='field';
