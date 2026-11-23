@@ -379,8 +379,8 @@ const mobile=document.getElementById('mobile');mobile.innerHTML=['home','guide',
 (()=>{
  const intro=document.getElementById('valley-intro'),skip=document.getElementById('intro-skip'),replay=document.getElementById('valley-replay');
  const musicBtn=document.getElementById('music-toggle'),sfxBtn=document.getElementById('sfx-toggle');
- const audio=document.getElementById('valley-audio'),volume=document.getElementById('music-volume'),volumeValue=document.getElementById('music-volume-value');
- if(!intro||!skip||!replay||!audio)return;
+ const ambient=document.getElementById('valley-audio'),audio=document.getElementById('playlist-audio'),volume=document.getElementById('music-volume'),volumeValue=document.getElementById('music-volume-value');
+ if(!intro||!skip||!replay||!ambient||!audio)return;
  let introTimer,replayTimer,audioCtx,musicOn=false,sfxOn=true;
  const valleyLogo=intro.querySelector('.intro-logo');
  if(valleyLogo){valleyLogo.addEventListener('error',()=>{valleyLogo.remove();const fallback=document.createElement('div');fallback.className='intro-logo-fallback';fallback.innerHTML='<span>THE</span><strong>VALLEY</strong><em>ROLEPLAY</em>';intro.insertBefore(fallback,intro.querySelector('.intro-smoke'));document.body.classList.add('watermark-fallback')},{once:true});}
@@ -390,11 +390,13 @@ const mobile=document.getElementById('mobile');mobile.innerHTML=['home','guide',
  musicOn=readPref('valleyMusicEnabled',false);sfxOn=readPref('valleySfxEnabled',true);
  let savedVolume=25;try{const n=Number(localStorage.getItem('valleyMusicVolume'));if(Number.isFinite(n))savedVolume=Math.max(0,Math.min(100,n))}catch(e){}
  volume.value=String(savedVolume);audio.volume=savedVolume/100;volumeValue.textContent=savedVolume+'%';
- const paint=()=>{musicBtn.textContent=musicOn?'♫ MUSIC: ON':'♫ MUSIC: OFF';musicBtn.setAttribute('aria-pressed',String(musicOn));sfxBtn.textContent=sfxOn?'✧ SFX: ON':'✧ SFX: OFF';sfxBtn.setAttribute('aria-pressed',String(sfxOn));};
+ const paint=()=>{musicBtn.textContent=musicOn?'♫ PLAYLIST: ON':'♫ PLAYLIST: OFF';musicBtn.setAttribute('aria-pressed',String(musicOn));sfxBtn.textContent=sfxOn?'✧ SFX: ON':'✧ SFX: OFF';sfxBtn.setAttribute('aria-pressed',String(sfxOn));};
  function context(){if(!audioCtx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;audioCtx=new AC()}if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx}
  function tone(freq,duration=.18,volume=.025,type='sine',when=0){const c=context();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(freq,c.currentTime+when);g.gain.setValueAtTime(.0001,c.currentTime+when);g.gain.exponentialRampToValueAtTime(volume,c.currentTime+when+.025);g.gain.exponentialRampToValueAtTime(.0001,c.currentTime+when+duration);o.connect(g);g.connect(c.destination);o.start(c.currentTime+when);o.stop(c.currentTime+when+duration+.04)}
  function startMusic(){audio.volume=Number(volume.value)/100;const result=audio.play();if(result&&result.catch)result.catch(()=>{musicOn=false;persist('valleyMusicEnabled',false);paint()})}
  function stopMusic(){audio.pause()}
+ function startAmbient(){ambient.volume=0.22;const result=ambient.play();if(result&&result.catch)result.catch(()=>{});}
+ ambient.addEventListener('ended',()=>{ambient.currentTime=0;startAmbient()});
  function sfx(kind='click'){if(!sfxOn)return;if(kind==='whoosh'){tone(330,.16,.012,'sine');tone(520,.2,.008,'sine',.06)}else if(kind==='hover'){tone(760,.07,.003,'sine')}else if(kind==='skip'){tone(440,.22,.02,'triangle');tone(660,.28,.014,'sine',.09)}else{tone(620,.09,.012,'sine');tone(920,.12,.008,'sine',.035)}}
  function finishIntro(){clearTimeout(introTimer);intro.classList.remove('clearing');intro.classList.add('done');document.body.classList.remove('intro-active');sfx('skip')}
  function playIntro(){clearTimeout(introTimer);intro.classList.remove('done','clearing');void intro.offsetWidth;document.body.classList.add('intro-active');if(reduceMotion){introTimer=setTimeout(finishIntro,1800);return}introTimer=setTimeout(()=>intro.classList.add('clearing'),5000);introTimer=setTimeout(finishIntro,12000)}
@@ -405,9 +407,9 @@ const mobile=document.getElementById('mobile');mobile.innerHTML=['home','guide',
  musicBtn.addEventListener('click',()=>{musicOn=!musicOn;persist('valleyMusicEnabled',musicOn);paint();if(musicOn)startMusic();else stopMusic();sfx('click')});
  sfxBtn.addEventListener('click',()=>{sfxOn=!sfxOn;persist('valleySfxEnabled',sfxOn);paint();if(sfxOn)sfx('click')});
  volume.addEventListener('input',()=>{audio.volume=Number(volume.value)/100;volumeValue.textContent=volume.value+'%';persist('valleyMusicVolume',volume.value)});
- audio.addEventListener('error',()=>{musicBtn.title='Upload audio [music].mp3 to the website repository to enable playback';});
+ audio.addEventListener('error',()=>{musicBtn.title='The playlist track could not be loaded';});
  paint();
- const unlock=()=>{if(musicOn)startMusic();document.removeEventListener('pointerdown',unlock);document.removeEventListener('keydown',unlock)};
+ const unlock=()=>{startAmbient();if(musicOn)startMusic();document.removeEventListener('pointerdown',unlock);document.removeEventListener('keydown',unlock)};
  document.addEventListener('pointerdown',unlock,{once:true});document.addEventListener('keydown',unlock,{once:true});
  let hoverAt=0;document.addEventListener('pointerover',e=>{if(e.target.closest('a,button,.feature,.announcement-card,.link-card,.quick-link')){const now=Date.now();if(now-hoverAt>650){hoverAt=now;sfx('hover')}}});
  document.addEventListener('click',e=>{const target=e.target.closest('a,button,.feature,.announcement-card,.link-card,.quick-link');if(!target)return;sfx(target.id==='intro-skip'?'skip':'click');const flash=document.createElement('i');flash.className='valley-flash';flash.style.left=e.clientX+'px';flash.style.top=e.clientY+'px';document.body.appendChild(flash);setTimeout(()=>flash.remove(),600)});
