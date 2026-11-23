@@ -260,7 +260,7 @@ body.watermark-fallback:after{content:"THE  VALLEY  ROLEPLAY";display:grid;place
 
 
 /* Compact floating player above the website sound controls */
-#mini-music{position:fixed;right:20px;bottom:76px;z-index:31;width:276px;padding:12px 14px 10px;border:1px solid #78c9ff4d;border-radius:13px;background:linear-gradient(145deg,#0a2545ed,#041329f2);color:#e7f5ff;backdrop-filter:blur(16px);box-shadow:0 10px 35px #0008;font-family:inherit}
+#mini-music{position:absolute;right:0;bottom:calc(100% + 12px);z-index:31;width:276px;padding:12px 14px 10px;border:1px solid #78c9ff4d;border-radius:13px;background:linear-gradient(145deg,#0a2545ed,#041329f2);color:#e7f5ff;backdrop-filter:blur(16px);box-shadow:0 10px 35px #0008;font-family:inherit}
 .mini-topline{display:flex;align-items:center;gap:7px;margin-bottom:9px}
 .mini-equalizer{color:#78c9ff;font-size:14px}
 .mini-now{font-size:8px;letter-spacing:1.7px;font-weight:800;color:#8fcfff;flex:1}
@@ -293,13 +293,14 @@ body.watermark-fallback:after{content:"THE  VALLEY  ROLEPLAY";display:grid;place
   <div class="intro-smoke"></div><button class="intro-skip" id="intro-skip" type="button">SKIP INTRO ↗</button>
 </div>
 <audio id="valley-audio" src="audio%20%5Bmusic%5D.mp3" preload="none" loop></audio>
+
+<div id="valley-controls" aria-label="Website sound controls">
 <aside id="mini-music" aria-label="Quick music player">
   <div class="mini-topline"><span class="mini-equalizer">♫</span><span class="mini-now">VALLEY PLAYLIST</span><button id="mini-playlist-toggle" type="button" aria-expanded="false">PLAYLIST⌄</button></div>
   <div class="mini-main"><div class="mini-art">JN</div><div class="mini-track"><strong>TRD</strong><small>JN Studio's</small></div><button id="mini-play" type="button" aria-label="Play TRD">▶</button></div>
   <div class="mini-progress"><span id="mini-current">0:00</span><input id="mini-seek" type="range" min="0" max="132" value="0" step="0.1" aria-label="Mini player progress"><span>2:12</span></div>
   <div id="mini-playlist" hidden><div class="mini-list-title">YOUR PLAYLIST <span>01 TRACK</span></div><div class="mini-list-track"><b>01</b><span><strong>TRD</strong><small>JN Studio's</small></span><em>2:12</em></div></div>
 </aside>
-<div id="valley-controls" aria-label="Website sound controls">
   <button id="music-toggle" type="button" aria-pressed="false">♫ MUSIC: OFF</button>
   <label class="music-volume" for="music-volume" title="Adjust music volume">VOL <input id="music-volume" type="range" min="0" max="100" value="25" aria-label="Music volume"><span id="music-volume-value">25%</span></label>
   <button id="sfx-toggle" type="button" aria-pressed="true">✧ SFX: ON</button>
